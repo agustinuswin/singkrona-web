@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Singkrona</title>
+<meta name="description" content="Komputasi cloud dan AI yang membuat kerja lebih efisien dan terkontrol, pelanggan cepat direspons, dan fraud tercegah.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Libre+Franklin:wght@300..800&display=swap">
+<style>
+/* Layout concept: full-bleed photographs and alternating black and white bands, in the existing Singkrona brand, with the product itself (a live fraud monitor, a synchronising field of dots) as the proof.
+   Single deliberate look: the bands are fixed black and white whatever the viewer's theme. */
+:root{
+  --ink:#0a0a0b; --char:#17171a; --paper:#ffffff; --mist:#f2f3f1;
+  --ash:#6c6c72; --smoke:#a2a2a8; --line:#deded9; --line-d:#2c2c30;
+  --blue:#2433e0; --blue-l:#8d98ff; --signal:#ff2d20; --calm:#35c07a;
+  --display:"Libre Franklin","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s1:clamp(3.1rem,9.4vw,8.6rem); --s2:clamp(2.3rem,5.6vw,4.9rem); --s3:clamp(1.55rem,2.8vw,2.3rem);
+  --nav:60px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--display);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ink)}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+h1,h2,h3,p,ul,ol,figure,blockquote{margin:0;padding:0}
+ul,ol{list-style:none}
+h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:1.03;text-wrap:balance}
+:focus-visible{outline:2px solid var(--blue-l);outline-offset:3px;border-radius:4px}
+.wrap{width:100%;max-width:1320px;margin-inline:auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.band{padding-block:clamp(80px,12vw,168px)}
+.b-ink{background:var(--ink);color:var(--paper)}
+.b-paper{background:var(--paper)}
+.b-mist{background:var(--mist)}
+.h2{font-size:var(--s2)}
+.lead{font-size:clamp(1.15rem,1.8vw,1.45rem);line-height:1.42;max-width:38em;color:var(--ash);font-weight:400;letter-spacing:-.012em}
+.b-ink .lead{color:var(--smoke)}
+.eyebrow{font-family:var(--mono);font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ash)}
+.b-ink .eyebrow{color:var(--smoke)}
+.stack{display:grid;gap:22px}
+.btn{display:inline-flex;align-items:center;gap:.5em;min-height:48px;padding:.62em 1.45em;border-radius:999px;font-weight:600;font-size:1rem;letter-spacing:-.01em;transition:transform .2s,background .2s,color .2s}
+.btn:hover{transform:scale(1.03)}
+.btn-w{background:var(--paper);color:var(--ink)}
+.btn-k{background:var(--ink);color:var(--paper)}
+.btn-g{color:var(--paper);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.65)}
+.more{font-weight:600;color:var(--blue);display:inline-flex;gap:.35em}
+.b-ink .more{color:var(--blue-l)}
+.more:hover{text-decoration:underline;text-underline-offset:.2em}
+.js .rise:not(.in){transform:translateY(30px)}
+.rise{transition:transform 1s cubic-bezier(.16,1,.3,1)}
+
+/* Navigation */
+.nav{position:fixed;inset:0 0 auto;z-index:50;padding-top:env(safe-area-inset-top,0px);color:var(--paper);transition:background .3s}
+.nav.solid,.nav.open{background:rgba(10,10,11,.78);-webkit-backdrop-filter:saturate(170%) blur(18px);backdrop-filter:saturate(170%) blur(18px)}
+.nav-in{height:var(--nav);display:flex;align-items:center;gap:28px}
+.brand img{height:24px;width:auto}
+.links{display:flex;gap:30px;margin-left:auto;font-size:.92rem}
+.links a{opacity:.8;padding-block:6px;transition:opacity .2s}
+.links a:hover,.links a[aria-current="page"]{opacity:1}
+.links a[aria-current="page"]{font-weight:600}
+.lang{display:flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.16);font-family:var(--mono);font-size:.75rem}
+.lang button{min-width:38px;height:30px;border-radius:999px;color:var(--paper);transition:background .2s,color .2s}
+.lang button[aria-pressed="true"]{background:var(--paper);color:var(--ink);font-weight:500}
+.menu{display:none;width:44px;height:44px;margin-right:-10px;position:relative}
+.menu i{position:absolute;left:11px;right:11px;height:2px;background:currentColor;transition:transform .25s,top .25s}
+.menu i:first-child{top:17px}.menu i:last-child{top:26px}
+.nav.open .menu i:first-child{top:21px;transform:rotate(45deg)}
+.nav.open .menu i:last-child{top:21px;transform:rotate(-45deg)}
+
+/* Opening */
+.stage{height:155svh;background:var(--ink);color:var(--paper)}
+.stage-pin{position:sticky;top:0;height:100svh;min-height:560px;overflow:hidden;background:var(--ink)}
+.stage-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 40%;transform-origin:62% 44%;animation:push 2.4s cubic-bezier(.16,1,.3,1) both}
+.stage-pin::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.42),rgba(10,10,11,0) 24%,rgba(10,10,11,0) 44%,rgba(10,10,11,.72));pointer-events:none}
+.stage-fade{position:absolute;inset:0;z-index:1;background:var(--ink);opacity:0;pointer-events:none}
+.stage-copy{position:absolute;inset:auto 0 0;z-index:2;padding-bottom:clamp(30px,6vh,64px)}
+.stage-copy h1{font-size:var(--s1);line-height:.96;max-width:9.5em;letter-spacing:-.045em;animation:up 1.2s .2s cubic-bezier(.16,1,.3,1) both}
+.stage-sub{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:center;justify-content:space-between;margin-top:26px;animation:up 1.2s .4s cubic-bezier(.16,1,.3,1) both}
+.stage-sub p{max-width:30em;font-size:clamp(1.05rem,1.5vw,1.28rem);line-height:1.4;font-weight:500}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+@keyframes push{from{scale:1.09}to{scale:1}}
+@keyframes up{from{transform:translateY(34px)}to{transform:none}}
+
+/* Scroll-lit statement */
+.say{font-size:clamp(1.9rem,4.6vw,4.1rem);line-height:1.13;font-weight:700;letter-spacing:-.033em;max-width:21em}
+.say .w{color:#77777c;transition:color .3s}
+.say .w.on{color:var(--paper)}
+.b-paper .say .w,.b-mist .say .w{color:#9b9b9f}
+.b-paper .say .w.on,.b-mist .say .w.on{color:var(--ink)}
+
+/* Tiles */
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;margin-top:clamp(40px,6vw,72px)}
+.tile{position:relative;overflow:hidden;border-radius:22px;min-height:380px;display:flex;flex-direction:column;padding:clamp(22px,2.6vw,34px);background:var(--mist)}
+.tile>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+.tile:hover>img{transform:scale(1.03)}
+.tile.photo{color:var(--paper)}
+.tile.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.78),rgba(10,10,11,.05) 60%)}
+.tile>div{position:relative;z-index:1;display:grid;gap:10px;max-width:24em}
+.tile h3{font-size:var(--s3)}
+.tile p:not(.eyebrow){font-size:1rem;line-height:1.42}
+.tile.photo .eyebrow{color:rgba(255,255,255,.86)}
+.t1{grid-column:span 5;grid-row:span 2}
+.t2{grid-column:span 7;min-height:430px}
+.t3{grid-column:span 4;background:var(--char);color:var(--paper)}
+.t3 .eyebrow,.t4 .eyebrow{color:var(--smoke)}
+.t4{grid-column:span 3;background:var(--signal);color:var(--paper);justify-content:space-between}
+.t4 .eyebrow{color:var(--paper)}
+.t4 .more{color:var(--paper)}
+.mini{position:relative;z-index:1;display:grid;gap:9px;margin-top:auto;padding-top:24px;font-family:var(--mono);font-size:.76rem;color:var(--smoke)}
+.mini li{display:grid;grid-template-columns:1fr 92px 2.6em;gap:10px;align-items:center}
+.mini b{display:block;height:6px;border-radius:9px;background:var(--line-d);overflow:hidden}
+.mini b::after{content:"";display:block;height:100%;width:var(--v);background:var(--paper);border-radius:9px}
+.mini span:last-child{text-align:right;color:var(--paper)}
+
+/* Fraud monitor */
+.demo-head{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 60px;align-items:end}
+.monitor{margin-top:clamp(36px,5vw,64px);border:1px solid var(--line-d);border-radius:22px;background:var(--char);overflow:hidden}
+.mon-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line-d);font-family:var(--mono);font-size:.76rem;color:var(--smoke)}
+.mon-chip{display:inline-flex;align-items:center;gap:7px;color:var(--paper)}
+.mon-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--calm)}
+.mon-chip.paused::before{background:var(--smoke)}
+.mon-tag{padding:3px 9px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line-d)}
+#demo-toggle{margin-left:auto;color:var(--paper);padding:5px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--smoke);min-height:30px}
+.mon-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--line-d)}
+.mon-stats div{padding:18px 20px;min-width:0}
+.mon-stats div+div{border-left:1px solid var(--line-d)}
+.mon-stats dt{font-family:var(--mono);font-size:.72rem;color:var(--smoke)}
+.mon-stats dd{margin:4px 0 0;font-size:clamp(1.15rem,2.5vw,1.9rem);font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--paper)}
+.mon-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+#feed{height:432px;overflow:hidden;border-right:1px solid var(--line-d)}
+.ev{display:grid;grid-template-columns:3.4em minmax(0,1fr) 7.4em 4.6em;gap:12px;align-items:center;width:100%;height:54px;padding-inline:20px;text-align:left;border-bottom:1px solid var(--line-d);color:var(--paper);font-size:.9rem;transition:background .2s}
+.ev.new{animation:rowin .5s cubic-bezier(.16,1,.3,1)}
+@keyframes rowin{from{height:0;opacity:0}to{height:54px;opacity:1}}
+.ev:hover{background:rgba(255,255,255,.04)}
+.ev[aria-pressed="true"]{background:rgba(255,255,255,.08)}
+.ev time,.ev .amt{font-family:var(--mono);font-size:.76rem;color:var(--smoke);font-variant-numeric:tabular-nums}
+.ev .amt{text-align:right}
+.ev .what{min-width:0;display:grid;line-height:1.22}
+.ev .what span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev .what small{font-size:.74rem;color:var(--smoke);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.risk{font-family:var(--mono);font-size:.74rem;text-align:center;padding:3px 0;border-radius:999px;color:var(--calm);box-shadow:inset 0 0 0 1px var(--line-d)}
+.risk.hot{background:var(--signal);color:var(--paper);box-shadow:none;font-weight:500}
+#detail{padding:22px 24px;display:grid;gap:14px;align-content:start;color:var(--paper);min-width:0}
+#detail h3{font-size:1.5rem;letter-spacing:-.025em;line-height:1.12}
+#detail .meta{font-family:var(--mono);font-size:.76rem;color:var(--smoke)}
+#detail ul{display:grid;gap:8px;font-size:.94rem;line-height:1.35}
+#detail li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:8px}
+#detail li::before{content:"";width:7px;height:7px;margin-top:.45em;border-radius:50%;background:var(--signal)}
+#detail.safe li::before{background:var(--calm)}
+.act{padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.07);font-size:.92rem;line-height:1.35}
+.act b{display:block;font-family:var(--mono);font-size:.7rem;font-weight:400;color:var(--smoke);margin-bottom:3px}
+
+/* Systems */
+.sys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:48px 32px;margin-top:clamp(40px,6vw,76px)}
+.sys h3{font-size:1.45rem;letter-spacing:-.026em;line-height:1.1;padding-bottom:14px;border-bottom:1px solid var(--ink);min-height:3.2em;display:flex;align-items:flex-end}
+.sys p{font-size:.97rem;line-height:1.42;color:var(--ash);margin-top:12px}
+
+/* Project */
+.rail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:clamp(36px,5vw,60px)}
+.card{position:relative;aspect-ratio:3/4;max-width:100%;overflow:hidden;border-radius:22px;color:var(--paper);background:var(--char);display:flex;flex-direction:column;justify-content:flex-end;padding:22px}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+.card:hover img{transform:scale(1.04)}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,0) 34%,rgba(10,10,11,.66) 62%,rgba(10,10,11,.88))}
+.card>div{position:relative;z-index:1;display:grid;gap:5px}
+.card .eyebrow{color:rgba(255,255,255,.82);font-size:.7rem}
+.card h3{font-size:1.6rem}
+.card p:not(.eyebrow){font-size:.94rem;line-height:1.34}
+.names{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 32px;margin-top:40px}
+.names li{padding-block:18px;border-top:1px solid currentColor}
+.names b{display:block;font-size:1.4rem;letter-spacing:-.025em}
+.names span{font-size:.92rem;color:var(--ash)}
+.b-ink .names li{border-color:var(--line-d)}
+.b-ink .names span{color:var(--smoke)}
+
+/* Quote and closing */
+.quote{font-size:clamp(2rem,5vw,4.4rem);font-weight:700;line-height:1.08;letter-spacing:-.035em;max-width:17em;text-wrap:balance}
+.close{display:flex;flex-wrap:wrap;gap:28px 60px;align-items:flex-end;justify-content:space-between}
+.close .h2{max-width:13em}
+
+/* Inner page openers */
+.open-photo{position:relative;min-height:min(92svh,860px);display:flex;align-items:flex-end;color:var(--paper);background:var(--ink);overflow:hidden}
+.open-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.open-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.5),rgba(10,10,11,.08) 30%,rgba(10,10,11,.78) 86%)}
+.open-photo .wrap{position:relative;z-index:1;padding-block:calc(var(--nav) + 40px) clamp(32px,6vh,64px);display:grid;gap:20px}
+.open-photo h1,.open-tech h1,.open-split h1{font-size:clamp(2.7rem,7.6vw,6.8rem);line-height:.98;letter-spacing:-.043em;max-width:11em}
+.open-photo p:not(.eyebrow){max-width:32em;font-size:clamp(1.08rem,1.6vw,1.3rem);line-height:1.42;font-weight:500}
+.open-tech{position:relative;min-height:min(92svh,860px);display:flex;align-items:flex-end;background:var(--ink);color:var(--paper);overflow:hidden}
+#sync{position:absolute;inset:0;width:100%;height:100%}
+.open-tech::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.2),rgba(10,10,11,0) 30%,rgba(10,10,11,.92) 82%);pointer-events:none}
+.open-tech .wrap{position:relative;z-index:1;padding-block:calc(var(--nav) + 40px) clamp(32px,6vh,64px);display:grid;gap:18px}
+.open-tech p{max-width:33em;font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.42;color:#d6d6da}
+.sync-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;font-family:var(--mono);font-size:.8rem;color:var(--smoke)}
+.sync-ctl output{color:var(--paper);font-variant-numeric:tabular-nums}
+#sync-reset{padding:7px 14px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--smoke);color:var(--paper)}
+.open-split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);min-height:min(100svh,860px);background:var(--ink);color:var(--paper)}
+.open-split>div{align-self:end;padding-top:calc(var(--nav) + 40px);padding-bottom:clamp(36px,7vh,76px);padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:32px;margin-left:max(0px,calc((100vw - 1320px)/2));display:grid;gap:20px;min-width:0}
+.open-split p:not(.eyebrow){max-width:29em;font-size:clamp(1.08rem,1.6vw,1.3rem);line-height:1.42;color:#d6d6da}
+.open-split img{width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+
+/* Thinker */
+.proc{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px 72px}
+.proc-side{position:sticky;top:calc(var(--nav) + 40px);align-self:start;display:grid;gap:20px}
+.steps{counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:3.2em minmax(0,1fr);padding-block:30px;border-top:1px solid var(--line)}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);font-family:var(--mono);font-size:.85rem;color:var(--ash);padding-top:.5em}
+.steps h3{font-size:var(--s3)}
+.steps p{margin-top:9px;color:var(--ash);max-width:34em}
+.steps small{display:block;margin-top:10px;font-family:var(--mono);font-size:.76rem;color:var(--ink)}
+.strip{display:block;width:100%;height:clamp(200px,33vw,460px);object-fit:cover;object-position:50% 40%}
+.prin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:52px 72px;margin-top:clamp(40px,6vw,76px)}
+.prin h3{font-size:var(--s3)}
+.prin p{margin-top:12px;color:var(--smoke);max-width:30em}
+
+/* Tech */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px 72px;align-items:start}
+.facts{display:grid}
+.facts li{padding-block:24px;border-top:1px solid var(--line)}
+.facts li:last-child{border-bottom:1px solid var(--line)}
+.facts h3{font-size:1.4rem;letter-spacing:-.026em}
+.facts p{margin-top:7px;color:var(--ash)}
+.b-ink .facts li{border-color:var(--line-d)}
+.b-ink .facts p{color:var(--smoke)}
+.ai{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:clamp(40px,6vw,68px)}
+.ai li{background:var(--paper);border-radius:22px;padding:28px;min-height:204px;display:grid;align-content:space-between;gap:30px}
+.ai h3{font-size:1.5rem;letter-spacing:-.028em;line-height:1.08}
+.ai p{color:var(--ash);font-size:.98rem;line-height:1.42}
+.pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:clamp(40px,6vw,72px);position:relative}
+.pipe li{position:relative;padding:26px 22px 0 0;border-top:1px solid var(--line-d);counter-increment:p}
+.pipe{counter-reset:p}
+.pipe li::before{content:"";position:absolute;top:-5px;left:0;width:9px;height:9px;border-radius:50%;background:var(--paper)}
+.pipe li:nth-child(4)::before{background:var(--signal)}
+.pipe h3{font-size:1.3rem;letter-spacing:-.025em}
+.pipe p{margin-top:8px;color:var(--smoke);font-size:.95rem;line-height:1.42}
+.rust-mark{background:var(--signal);color:var(--paper);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tech-rows{margin-top:clamp(36px,5vw,60px)}
+.tech-rows li{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr);gap:8px 24px;padding-block:20px;border-top:1px solid var(--line);align-items:baseline}
+.tech-rows li:last-child{border-bottom:1px solid var(--line)}
+.tech-rows p{font-size:clamp(1.25rem,2.5vw,2.05rem);font-weight:600;letter-spacing:-.028em;line-height:1.2}
+.cat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 40px;margin-top:clamp(36px,5vw,60px)}
+.cat h3{font-size:1.15rem;letter-spacing:-.02em;margin-bottom:12px}
+.cat li{padding-block:7px;font-size:.97rem;line-height:1.3;color:var(--ash);border-top:1px solid var(--line)}
+.cat-col{display:grid;gap:32px;align-content:start;min-width:0}
+
+/* About */
+.srv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 72px}
+.srv li{padding-block:17px;border-top:1px solid var(--line);font-size:clamp(1.25rem,2.3vw,1.85rem);font-weight:600;letter-spacing:-.028em;line-height:1.15}
+.prods{display:flex;flex-wrap:wrap;gap:10px 34px;font-size:clamp(1.5rem,3.4vw,2.9rem);font-weight:700;letter-spacing:-.036em;line-height:1.14;margin-top:22px}
+.contact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:clamp(36px,5vw,60px)}
+.contact h3{font-family:var(--mono);font-weight:400;font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--smoke);margin-bottom:10px}
+.contact p{font-size:1.25rem;line-height:1.3;letter-spacing:-.018em;overflow-wrap:anywhere}
+.copy{margin-top:10px;font-family:var(--mono);font-size:.76rem;padding:6px 12px;min-height:30px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--smoke)}
+
+/* Footer */
+.foot{background:var(--paper);padding-block:64px 52px}
+.foot-g{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:36px}
+.foot h3{font-size:1.15rem;letter-spacing:-.022em;margin-bottom:12px}
+.foot li,.foot p{font-size:.98rem;line-height:1.55;color:#3a3a3e}
+.foot a:hover{color:var(--blue)}
+.foot-logo{height:26px;width:auto;filter:invert(1);margin-bottom:14px}
+.legal{background:var(--ink);color:var(--smoke);font-size:.86rem;padding-block:26px}
+.legal .wrap{display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
+
+/* Project pages */
+main[data-project]{--p:#2433e0}
+.pj-open{background:var(--p);min-height:min(92svh,820px)}
+.pj-open .eyebrow a:hover{text-decoration:underline}
+.pj-media{position:relative;display:block;min-height:100%;overflow:hidden}
+.pj-media img{position:absolute;inset:0;height:100%}
+.pj-media::after{content:"";position:absolute;inset:0 0 auto;height:110px;background:linear-gradient(180deg,rgba(10,10,11,.5),rgba(10,10,11,0))}
+.open-split .pj-logo{height:64px;width:auto;margin-bottom:6px;justify-self:start;object-fit:contain}
+.pj-logo.r{border-radius:16px}
+.pj-logo.w{background:#fff;border-radius:16px;padding:7px;box-sizing:border-box}
+.open-split.pj-open p:not(.eyebrow){color:rgba(255,255,255,.92)}
+.pj-h{max-width:15em}
+.pj-grid{display:grid;gap:14px;margin-top:clamp(36px,5vw,64px);counter-reset:s}
+.pj-grid.n2,.pj-grid.n4{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pj-grid.n3,.pj-grid.n6{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pj-grid.seq.n4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pj-grid li{padding:28px;border-radius:22px;background:var(--mist);display:grid;gap:12px;align-content:start;min-height:190px}
+.pj-grid h3{font-size:1.55rem;letter-spacing:-.028em;line-height:1.08}
+.pj-grid p{color:var(--ash);font-size:1rem;line-height:1.42}
+.b-mist .pj-grid li{background:var(--paper)}
+.b-ink .pj-grid li{background:var(--char)}
+.b-ink .pj-grid p{color:var(--smoke)}
+.pj-spot{background:var(--p);color:var(--paper)}
+.pj-spot .eyebrow,.pj-spot .lead{color:rgba(255,255,255,.9)}
+.pj-spot .pj-grid li{background:rgba(255,255,255,.14)}
+.pj-spot .pj-grid p{color:rgba(255,255,255,.9)}
+.pj-grid.seq li{counter-increment:s}
+.pj-grid.seq li::before{content:counter(s);font-family:var(--mono);font-size:.85rem}
+.pj-chips{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:clamp(32px,4vw,52px);font-size:clamp(1.3rem,2.7vw,2.2rem);font-weight:600;letter-spacing:-.03em;line-height:1.2;color:var(--paper)}
+.pj-chips li:not(:last-child)::after{content:"·";margin-left:28px;color:var(--smoke)}
+.pj-next{display:flex;flex-wrap:wrap;gap:32px 72px;justify-content:space-between;align-items:flex-end}
+.pj-next a:first-child{display:grid;gap:8px}
+.pj-next b{font-size:var(--s2);letter-spacing:-.035em;line-height:1.05}
+.pj-next a:first-child:hover b{color:var(--blue)}
+.names a{display:block}
+.names a:hover b{text-decoration:underline;text-underline-offset:.15em}
+@media (max-width:980px){
+  .pj-open{min-height:0}
+  .pj-open>div{order:1}
+  .pj-media{order:0;height:min(58svh,520px);min-height:0}
+  .pj-grid.seq.n4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pj-grid.n3,.pj-grid.n6{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pj-grid.n3 li:last-child:nth-child(odd){grid-column:1/-1}
+}
+@media (max-width:620px){
+  .pj-grid.n2,.pj-grid.n3,.pj-grid.n4,.pj-grid.n6,.pj-grid.seq.n4{grid-template-columns:minmax(0,1fr)}
+  .pj-grid li{min-height:0;padding:22px}
+}
+.scr-group{margin-top:clamp(40px,5vw,64px)}
+.scr-group h3{display:flex;align-items:baseline;gap:10px;font-size:1.45rem;letter-spacing:-.026em;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.scr-group h3 span{font-family:var(--mono);font-size:.78rem;font-weight:400;letter-spacing:0;color:var(--ash)}
+.scr-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px 18px}
+.scr{display:grid;gap:9px;text-align:left;min-width:0}
+.scr-f{display:block;aspect-ratio:390/844;overflow:hidden;border-radius:18px;background:var(--mist);box-shadow:0 0 0 1px var(--line),0 10px 26px rgba(10,10,11,.09);transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s}
+.scr-f img{width:100%;height:auto;max-width:100%}
+.scr:hover .scr-f,.scr:focus-visible .scr-f{transform:translateY(-5px);box-shadow:0 0 0 1px var(--p),0 18px 34px rgba(10,10,11,.16)}
+.scr-c{font-size:.86rem;line-height:1.25;font-weight:500;color:#3a3a3e}
+.pov{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 40px;margin-top:clamp(36px,5vw,60px);counter-reset:v}
+.pov li{counter-increment:v;display:grid;gap:12px;align-content:start;padding-top:18px;border-top:2px solid var(--p);min-width:0}
+.pov li::before{content:counter(v);font-family:var(--mono);font-size:.85rem;color:var(--ash)}
+.pov h3{font-size:1.55rem;letter-spacing:-.028em;line-height:1.08}
+.pov p{font-size:1.02rem;line-height:1.5;color:#3a3a3e}
+.pov dl{margin:0;display:grid;gap:12px}
+.pov dl div{display:grid;gap:2px}
+.pov dt{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--p)}
+.pov dd{margin:0;font-size:1rem;line-height:1.4;color:#3a3a3e}
+.sl-head{display:flex;flex-wrap:wrap;gap:20px 40px;justify-content:space-between;align-items:flex-end}
+.sl-nav{display:flex;gap:8px}
+.sl-b{width:48px;height:48px;border-radius:50%;background:var(--mist);font-size:1.15rem;display:grid;place-items:center;transition:background .2s,color .2s}
+.sl-b:hover{background:var(--p);color:var(--paper)}
+.sl-rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x proximity;margin-top:clamp(28px,4vw,44px);padding:6px 2px 18px;scrollbar-width:none;scroll-behavior:smooth}
+.sl-rail::-webkit-scrollbar{display:none}
+.sl-rail .scr{flex:0 0 clamp(170px,18vw,232px);scroll-snap-align:start}
+.dash-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 18px;margin-top:clamp(24px,3vw,36px)}
+.dash-f{display:block;position:relative;overflow:hidden;border-radius:14px;background:var(--paper);padding-top:24px;box-shadow:0 0 0 1px var(--line),0 14px 34px rgba(10,10,11,.1);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.dash-f i{position:absolute;top:9px;left:12px;width:7px;height:7px;border-radius:50%;background:var(--p);box-shadow:13px 0 0 var(--line),26px 0 0 var(--line)}
+.dash-f img{display:block;width:100%;height:auto}
+.scr:hover .dash-f{transform:translateY(-4px)}
+#lb.wide #lb-v{width:min(1240px,100%)}
+#lb.wide #lb-s{align-self:center;max-height:100%}
+.scr-grid.pro{grid-template-columns:repeat(5,minmax(0,1fr))}
+.scr-grid.pro .scr-f{aspect-ratio:9/16}
+.spot-img{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:32px 64px;align-items:center}
+.spot-img img{width:100%;height:auto;border-radius:22px}
+#lb{position:fixed;inset:0;z-index:70;background:rgba(10,10,11,.92);display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 14px) max(10px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) max(10px,env(safe-area-inset-left,0px));color:var(--paper)}
+#lb-v{grid-column:2;justify-self:center;height:100%;width:min(390px,100%);display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;min-height:0}
+#lb-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.95rem}
+#lb-top span{font-family:var(--mono);font-size:.76rem;color:var(--smoke)}
+#lb-s{overflow-y:auto;border-radius:22px;background:var(--mist);overscroll-behavior:contain}
+#lb-s img{display:block;width:100%;height:auto}
+.lb-b{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.14);color:var(--paper);font-size:1.25rem;display:grid;place-items:center;justify-self:center}
+.lb-b:hover{background:rgba(255,255,255,.26)}
+#lb-x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:max(14px,env(safe-area-inset-right,0px))}
+@media (max-width:1180px){.scr-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:980px){.pov{grid-template-columns:minmax(0,1fr)}.scr-grid.pro{grid-template-columns:repeat(3,minmax(0,1fr))}.spot-img{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:620px){
+  .scr-grid,.scr-grid.pro{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px}
+  .dash-g{grid-template-columns:minmax(0,1fr)}
+  .sl-nav{display:none}
+  .sl-rail .scr{flex-basis:62%}
+  .sec-steps li{padding:22px}
+  .foot-g{grid-template-columns:minmax(0,1fr)}
+  #lb{grid-template-columns:minmax(0,1fr);padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+  #lb-v{grid-column:1;padding-right:0}
+  #lb-top{padding-right:58px}
+  #lb-p,#lb-n{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);background:rgba(10,10,11,.72)}
+  #lb-p{left:18px}#lb-n{right:18px}
+}
+/* Project page */
+.pr-hero{background:var(--ink);color:var(--paper);padding-block:calc(var(--nav) + clamp(48px,8vw,96px)) clamp(36px,5vw,64px);overflow:hidden}
+.pr-hero h1{font-size:var(--s1);line-height:.96;letter-spacing:-.045em}
+.pr-hero .eyebrow{color:var(--smoke)}
+.pr-hero .lead{color:var(--smoke);max-width:34em}
+.pr-hero .wrap{margin-bottom:clamp(36px,5vw,60px)}
+.mq{overflow:hidden;margin-top:14px}
+.mq-t{display:flex;width:max-content;animation:mq var(--d,60s) linear infinite}
+.mq-t>div{display:flex;gap:14px;padding-right:14px}
+.mq.rev .mq-t{animation-direction:reverse}
+.mq:hover .mq-t{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.mq-p{display:block;flex:none;width:clamp(120px,13vw,190px);aspect-ratio:390/560;overflow:hidden;border-radius:16px;background:var(--char)}
+.mq-p img{display:block;width:100%;height:auto;max-width:100%}
+.pr-list{background:var(--ink);padding-block:clamp(20px,4vw,48px) clamp(64px,9vw,120px)}
+.pr{position:sticky;top:calc(var(--nav) + 12px + var(--n)*10px);min-height:clamp(480px,76svh,640px);margin-bottom:22px;border-radius:28px;background:var(--c);color:var(--paper);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);overflow:hidden;box-shadow:0 -14px 40px rgba(10,10,11,.35)}
+.pr-t{display:grid;gap:14px;align-content:start;justify-items:start;padding:clamp(26px,4vw,52px);min-width:0}
+.pr-t .eyebrow{color:rgba(255,255,255,.88)}
+.pr-t h2{font-size:var(--s2)}
+.pr-t p:not(.eyebrow){font-size:1.1rem;line-height:1.4;max-width:26em}
+.pr .pj-logo{height:56px;width:auto;object-fit:contain;margin-bottom:10px}
+.pr .pj-logo.r{border-radius:14px}
+.pr .pj-logo.w{background:#fff;border-radius:14px;padding:6px;box-sizing:border-box}
+.pr-ph{display:flex;gap:16px;justify-content:center;align-items:flex-start;padding:40px 24px 0;min-width:0;overflow:hidden}
+.pr-ph img{flex:1 1 0;min-width:0;width:0;max-width:230px;height:auto;border-radius:20px;box-shadow:0 18px 40px rgba(10,10,11,.3);animation:drift 7s ease-in-out infinite alternate;animation-delay:calc(var(--k)*-2.2s)}
+@keyframes drift{from{transform:translateY(calc(var(--k)*26px))}to{transform:translateY(calc(var(--k)*26px - 44px))}}
+/* Security page */
+.sec-open{background:var(--ink);color:var(--paper);padding-block:calc(var(--nav) + clamp(44px,7vw,84px)) clamp(44px,6vw,76px);overflow:hidden}
+.sec-g{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:36px 60px;align-items:center}
+.sec-g h1{font-size:clamp(2.7rem,6.6vw,5.9rem);line-height:.98;letter-spacing:-.043em}
+.sec-g .lead{color:#d6d6da}
+.sec-g .eyebrow{color:var(--smoke)}
+.sec-panel{border:1px solid var(--line-d);border-radius:22px;background:var(--char);overflow:hidden;min-width:0}
+.sec-head{display:flex;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line-d);font-family:var(--mono);font-size:.74rem;color:var(--smoke)}
+.sec-log{height:352px;overflow:hidden;font-family:var(--mono);font-size:.76rem}
+.sec-t{animation:up-log 26s linear infinite}
+@keyframes up-log{to{transform:translateY(-50%)}}
+.sec-r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:11px 18px;border-bottom:1px solid var(--line-d);height:64px;box-sizing:border-box}
+.sec-r b{font-weight:500;color:var(--paper)}
+.sec-r i{font-style:normal;color:var(--signal);font-weight:500}
+.sec-r span{grid-column:1/-1;color:var(--smoke);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mq-w{font-size:clamp(1.7rem,4.4vw,3.6rem);font-weight:700;letter-spacing:-.035em;line-height:1.15;background:var(--ink);color:var(--paper);padding-block:clamp(36px,5vw,60px)}
+.mq-w .mq{margin:0}
+.mq-w .mq-t>div{gap:40px;padding-right:40px;white-space:nowrap}
+.mq-w .mq.rev{color:#77777c}
+.sec-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:clamp(36px,5vw,60px);counter-reset:s}
+.sec-steps li{counter-increment:s;padding:28px;border-radius:22px;background:var(--paper);display:grid;gap:12px;align-content:start;min-width:0}
+.sec-steps li::before{content:counter(s);font-family:var(--mono);font-size:.85rem;color:var(--ash)}
+.sec-steps h3{font-size:1.55rem;letter-spacing:-.028em;line-height:1.08}
+.sec-steps p{color:var(--ash);line-height:1.42}
+.sec-steps code{font-family:var(--mono);font-size:.76rem;color:var(--ink);overflow-wrap:anywhere}
+@media (max-width:980px){
+  .sec-g,.sec-steps{grid-template-columns:minmax(0,1fr)}
+  .pr{grid-template-columns:minmax(0,1fr);position:relative;top:auto;min-height:0;box-shadow:none}
+  .pr .pj-logo{margin-bottom:12px}
+  .pr-ph{height:300px;padding-top:24px}
+  .pr-ph img{max-width:170px}
+}
+/* Office simulation */
+.of-stage{position:relative;margin-top:clamp(32px,4vw,52px);aspect-ratio:16/9;max-width:100%;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#dbe8ff,#f1f6ff 58%,#fbf7ec);touch-action:pan-y}
+.of-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.of-stage.live .of-poster{visibility:hidden}
+#of-cv{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+#of-cv:active{cursor:grabbing}
+.of-labels{position:absolute;inset:0;pointer-events:none;opacity:0}
+.of-stage.live .of-labels{opacity:1}
+.of-l{position:absolute;left:0;top:0;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--ink);font-size:.76rem;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(20,30,60,.14)}
+.of-tag{position:absolute;left:16px;bottom:14px;font-family:var(--mono);font-size:.7rem;color:#46506a}
+.of-btn{position:absolute;right:14px;bottom:12px;min-height:34px;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.92);font-size:.8rem;font-weight:600;color:var(--ink)}
+.of-steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px;counter-reset:s}
+.of-steps li{counter-increment:s;display:grid;gap:4px;align-content:start;padding:14px;border-radius:16px;background:var(--mist);transition:background .35s,color .35s;min-width:0}
+.of-steps li::before{content:counter(s);font-family:var(--mono);font-size:.74rem;color:var(--ash)}
+.of-steps b{font-size:.98rem;letter-spacing:-.018em;line-height:1.15}
+.of-steps span{font-size:.86rem;line-height:1.32;color:var(--ash)}
+.of-steps li.on{background:var(--blue);color:var(--paper)}
+.of-steps li.on span,.of-steps li.on::before{color:rgba(255,255,255,.9)}
+.gain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:36px 32px;margin-top:clamp(36px,5vw,64px)}
+.gain li{display:grid;gap:10px;align-content:start;padding-top:18px;border-top:1px solid var(--line-d);min-width:0}
+.gain h3{font-size:var(--s3)}
+.gain p{color:var(--smoke);line-height:1.45}
+@media (max-width:980px){.of-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.gain{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.of-stage{aspect-ratio:1/1;border-radius:20px}.of-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.gain{grid-template-columns:minmax(0,1fr)}.of-l{font-size:.66rem;padding:3px 7px}.of-tag{display:none}}
+@media (max-width:1180px){
+  .rail{grid-template-columns:repeat(5,minmax(240px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}
+  .card{scroll-snap-align:start}
+  .names{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:980px){
+  .sys{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sys h3{min-height:0}
+  .names{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .t1,.t2{grid-column:span 12}.t1{grid-row:auto;min-height:560px}
+  .t3,.t4{grid-column:span 6}
+  .demo-head,.proc,.split{grid-template-columns:minmax(0,1fr)}
+  .proc-side{position:static}
+  .mon-grid{grid-template-columns:minmax(0,1fr)}
+  #feed{border-right:0;border-bottom:1px solid var(--line-d);height:324px}
+  #detail{min-height:330px}
+  .ai,.cat{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pipe{grid-template-columns:minmax(0,1fr);gap:0}
+  .pipe li{border-top:0;border-left:1px solid var(--line-d);padding:0 0 26px 24px}
+  .pipe li::before{top:6px;left:-5px}
+  .open-split{grid-template-columns:minmax(0,1fr)}
+  .open-split img{height:min(62svh,560px);order:-1}
+  .open-split>div{padding-top:32px;padding-right:24px;margin-left:0}
+}
+@media (max-width:820px){
+  .menu{display:block}
+  .nav-in{justify-content:space-between}
+  .lang{margin-left:auto}
+  .links{position:absolute;top:calc(var(--nav) + env(safe-area-inset-top,0px));left:0;right:0;margin:0;display:none;flex-direction:column;gap:0;background:rgba(10,10,11,.97);padding:10px max(24px,env(safe-area-inset-right,0px)) 26px max(24px,env(safe-area-inset-left,0px));font-size:1.9rem;font-weight:600;letter-spacing:-.03em}
+  .links a{opacity:1;padding-block:9px}
+  .nav.open .links{display:flex}
+}
+@media (max-width:620px){
+  body{font-size:16px}
+  .stage-img{object-position:26% 50%;transform-origin:30% 44%}
+  .bento{gap:10px}
+  .tile{min-height:340px;border-radius:18px}
+  .t1,.t2,.t3,.t4{grid-column:span 12}
+  .t4{min-height:260px}
+  .rail{grid-template-columns:repeat(5,76%);gap:10px}
+  .ev{grid-template-columns:minmax(0,1fr) 6.4em 3.2em;padding-inline:14px;gap:9px}
+  .ev time{display:none}
+  .mon-stats{grid-template-columns:1fr .8fr 1.7fr}.mon-stats div{padding:13px 12px}.mon-stats dd{font-size:.92rem;white-space:nowrap}
+  .mon-bar{padding-inline:14px}
+  .ai,.cat,.prin,.srv,.contact{grid-template-columns:minmax(0,1fr)}
+  .prin{gap:38px}
+  .tech-rows li{grid-template-columns:minmax(0,1fr)}
+  .names{grid-template-columns:minmax(0,1fr)}
+  .foot-g{grid-template-columns:minmax(0,1fr)}
+  .sys{grid-template-columns:minmax(0,1fr);gap:32px}
+}
+@media (prefers-reduced-motion:reduce){
+  .mq{overflow-x:auto}
+  .sec-log{overflow-y:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .stage{height:auto}.stage-pin{position:relative}
+  .js .rise:not(.in){transform:none}
+}
+</style>
+<meta property="og:title" content="Singkrona">
+<meta property="og:description" content="Komputasi cloud dan AI yang membuat kerja lebih efisien dan terkontrol, pelanggan cepat direspons, dan fraud tercegah.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="img/run.webp">
+<link rel="icon" href="img/lg-singkrona.png">
+</head>
+<body>
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#home" aria-label="Singkrona"><img src="img/logo.png" alt="Singkrona" width="122" height="24"></a>
+    <nav class="links" id="links" aria-label="Utama">
+      <a href="#home">Home</a>
+      <a href="#thinker">Thinker</a>
+      <a href="#tech">Tech</a>
+      <a href="#project">Project</a>
+      <a href="#security">Security</a>
+      <a href="#about">About</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Bahasa / Language">
+      <button type="button" data-lang="id" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="menu" id="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="links"><i></i><i></i></button>
+  </div>
+</header>
+
+<!-- HOME -->
+<main data-view="home">
+  <section class="stage" id="stage">
+    <div class="stage-pin">
+      <img class="stage-img" id="stage-img" src="img/run.webp" alt="Seorang ibu dan dua anak berlari menaiki bukit hijau di bawah langit cerah" data-en-alt="A mother and two children running up a green hill under a bright sky" width="1672" height="941">
+      <div class="stage-fade" id="stage-fade"></div>
+      <div class="stage-copy" id="stage-copy">
+        <div class="wrap">
+          <h1 data-en="The future is already running.">Masa depan sudah berlari.</h1>
+          <div class="stage-sub">
+            <p data-en="Cloud computing and AI that make work far more efficient and controlled, keep customers answered, and stop fraud.">Komputasi cloud dan AI yang membuat kerja jauh lebih efisien dan terkontrol, pelanggan cepat direspons, dan fraud tercegah.</p>
+            <div class="cta-row">
+              <a class="btn btn-w" href="#tech" data-en="See how it works">Lihat cara kerjanya</a>
+              <a class="btn btn-g" href="https://wa.me/6281808001811" target="_blank" rel="noopener" data-en="Talk to us">Bicara dengan kami</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <p class="say" data-en="Our children will grow up in a world that runs on software. The businesses we build today have to be ready for it. Singkrona brings sales, stock, finance and people into one system that thinks alongside you.">Anak-anak kita akan tumbuh di dunia yang berjalan dengan perangkat lunak. Usaha yang kita bangun hari ini harus siap untuk dunia itu. Singkrona menyatukan penjualan, stok, keuangan, dan orang dalam satu sistem yang berpikir bersama Anda.</p>
+    </div>
+  </section>
+
+    <section class="band b-paper" id="office">
+    <div class="wrap">
+      <div class="stack">
+        <p class="eyebrow" data-en="Your office, automated">Kantor Anda, otomatis</p>
+        <h2 class="h2 pj-h" data-en="An office that runs itself.">Kantor yang berjalan sendiri.</h2>
+        <p class="lead" data-en="Every division works in one system. One order comes in, and the work moves from desk to desk by itself, with nobody retyping data or chasing the next step.">Setiap divisi bekerja dalam satu sistem. Satu pesanan masuk, lalu pekerjaan berpindah sendiri dari meja ke meja, tanpa ada yang mengetik ulang data atau mengejar langkah berikutnya.</p>
+      </div>
+      <div class="of-stage" id="of-stage">
+        <img class="of-poster" src="img/office.webp" alt="Ilustrasi kantor tiga dimensi dengan enam divisi yang terhubung oleh jalur data" data-en-alt="A 3D illustration of an office with six divisions linked by data lines" width="1600" height="900">
+        <canvas id="of-cv" aria-hidden="true"></canvas>
+        <div class="of-labels" aria-hidden="true">
+          <span class="of-l" data-r="cs" data-en="Customer Care">Layanan Pelanggan</span>
+          <span class="of-l" data-r="sales" data-en="Sales">Penjualan</span>
+          <span class="of-l" data-r="wh" data-en="Warehouse">Gudang</span>
+          <span class="of-l" data-r="fin" data-en="Finance">Keuangan</span>
+          <span class="of-l" data-r="ctrl" data-en="Control">Kontrol</span>
+          <span class="of-l" data-r="hr" data-en="People">SDM</span>
+        </div>
+        <span class="of-tag" data-en="Illustration · drag to turn">Ilustrasi · geser untuk memutar</span>
+        <button type="button" id="of-toggle" class="of-btn"></button>
+      </div>
+      <ol class="of-steps" id="of-steps">
+        <li class="on"><b data-en="Customer Care">Layanan Pelanggan</b><span data-en="A customer asks. AI answers right away.">Pelanggan bertanya, AI langsung menjawab.</span></li>
+        <li><b data-en="Sales">Penjualan</b><span data-en="The order is recorded by itself.">Pesanan tercatat dengan sendirinya.</span></li>
+        <li><b data-en="Warehouse">Gudang</b><span data-en="Stock updates and the goods are prepared.">Stok diperbarui, barang disiapkan.</span></li>
+        <li><b data-en="Finance">Keuangan</b><span data-en="The invoice and journal entry are created.">Faktur dan jurnal terbit.</span></li>
+        <li><b data-en="People">SDM</b><span data-en="Commission and team performance update.">Komisi dan kinerja tim diperbarui.</span></li>
+        <li><b data-en="Control">Kontrol</b><span data-en="You see everything, and anomalies are flagged.">Anda melihat semuanya, anomali ditandai.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <h2 class="h2 pj-h" data-en="What changes in your business.">Yang berubah di usaha Anda.</h2>
+      <ul class="gain">
+        <li><h3 data-en="Far more efficient">Kerja jauh lebih efisien</h3><p data-en="Repeated work runs automatically, so your team spends its time on what matters.">Pekerjaan berulang berjalan otomatis, sehingga tim memakai waktunya untuk hal yang penting.</p></li>
+        <li><h3 data-en="Fully under control">Proses lebih terkontrol</h3><p data-en="Every division shares one set of data. Each step is recorded and visible from one screen.">Semua divisi memakai data yang sama. Setiap langkah tercatat dan terlihat dari satu layar.</p></li>
+        <li><h3 data-en="Customers get answers">Pelanggan cepat direspons</h3><p data-en="AI and your team answer from the same information, including after closing time.">AI dan tim menjawab dari informasi yang sama, termasuk setelah toko tutup.</p></li>
+        <li><h3 data-en="Fraud gets stopped">Fraud tercegah</h3><p data-en="Whatever breaks the normal pattern is flagged before it turns into a loss.">Yang keluar dari pola normal ditandai sebelum menjadi kerugian.</p><a class="more" href="#demo" data-en="See the simulation →">Lihat simulasinya →</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <div class="stack">
+        <h2 class="h2" data-en="Technology that gives you your time back.">Teknologi yang mengembalikan waktu Anda.</h2>
+        <p class="lead" data-en="When the system watches the business, you get to be somewhere else.">Saat sistem menjaga usaha, Anda bisa berada di tempat lain.</p>
+      </div>
+      <div class="bento">
+        <article class="tile photo t1 rise">
+          <img src="img/kitchen.webp" alt="Keluarga tertawa saat sarapan di dapur" data-en-alt="A family laughing over breakfast in the kitchen" loading="lazy">
+          <div>
+            <p class="eyebrow">Cloud</p>
+            <h3 data-en="The shop is open. You’re at breakfast.">Toko sudah buka. Anda masih sarapan.</h3>
+            <p data-en="Sales, stock and reports live in the cloud and open from any phone.">Penjualan, stok, dan laporan tersimpan di cloud dan terbuka dari ponsel mana pun.</p>
+          </div>
+        </article>
+        <article class="tile photo t2 rise">
+          <img src="img/swing.webp" alt="Anak perempuan tertawa lepas di ayunan" data-en-alt="A girl laughing on a swing" loading="lazy" style="object-position:30% 40%">
+          <div>
+            <p class="eyebrow">AI</p>
+            <h3 data-en="AI answers customers after closing time.">AI menjawab pelanggan setelah toko tutup.</h3>
+            <p data-en="An agent that knows your products can serve, follow up and find new buyers.">Agen yang mengenal produk Anda bisa melayani, menindaklanjuti, dan mencari pembeli baru.</p>
+          </div>
+        </article>
+        <article class="tile t3 rise">
+          <div>
+            <p class="eyebrow" data-en="Control">Kontrol</p>
+            <h3 data-en="Every branch, on one screen.">Semua cabang, satu layar.</h3>
+          </div>
+          <ul class="mini" aria-label="Contoh target harian per cabang" data-en-aria="Example daily target per branch">
+            <li><span>Seminyak</span><b style="--v:92%"></b><span>92%</span></li>
+            <li><span>Ubud</span><b style="--v:78%"></b><span>78%</span></li>
+            <li><span>Canggu</span><b style="--v:64%"></b><span>64%</span></li>
+            <li><span data-en="Warehouse">Gudang</span><b style="--v:97%"></b><span>97%</span></li>
+            <li style="grid-template-columns:1fr"><span style="text-align:left;color:var(--smoke)" data-en="Example view">Contoh tampilan</span></li>
+          </ul>
+        </article>
+        <article class="tile t4 rise">
+          <div>
+            <p class="eyebrow">Anti-fraud</p>
+            <h3 data-en="Find the leak before it costs you.">Temukan kebocoran sebelum jadi kerugian.</h3>
+          </div>
+          <a class="more" href="#demo" data-en="See it at work →">Lihat cara kerjanya →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-ink" id="demo">
+    <div class="wrap">
+      <div class="demo-head">
+        <h2 class="h2" data-en="Money leaks quietly. AI sees it first.">Uang bocor diam-diam. AI melihatnya lebih dulu.</h2>
+        <p class="lead" data-en="One void is normal. Six voids from the same cashier before closing is a pattern. AI learns the normal rhythm of your business and flags whatever breaks it.">Satu void itu wajar. Enam void dari kasir yang sama menjelang tutup adalah pola. AI mempelajari ritme normal usaha Anda, lalu menandai yang menyimpang.</p>
+      </div>
+      <div class="monitor" id="monitor">
+        <div class="mon-bar">
+          <span class="mon-chip" id="demo-state"></span>
+          <span class="mon-tag" data-en="Simulation · example data">Simulasi · data contoh</span>
+          <button type="button" id="demo-toggle"></button>
+        </div>
+        <dl class="mon-stats">
+          <div><dt data-en="Transactions checked">Transaksi dicek</dt><dd id="st-n">0</dd></div>
+          <div><dt data-en="Flagged">Ditandai</dt><dd id="st-f">0</dd></div>
+          <div><dt data-en="Value held for review">Nilai ditahan</dt><dd id="st-v">0</dd></div>
+        </dl>
+        <div class="mon-grid">
+          <div id="feed" aria-label="Aliran transaksi" data-en-aria="Transaction stream"></div>
+          <div id="detail" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <h2 class="h2" data-en="One system for the whole business.">Satu sistem untuk seluruh usaha.</h2>
+      <div class="sys">
+        <div><h3 data-en="Point of Sale (POS)">Point of Sale (POS)</h3><p data-en="Records sales in real time, connected to stock and financial reports.">Mencatat penjualan secara real time, terhubung ke stok dan laporan keuangan.</p></div>
+        <div><h3 data-en="Inventory Management">Manajemen Inventori</h3><p data-en="Tracks stock in and out, and prevents shortages and overstock.">Melacak stok masuk dan keluar, mencegah kehabisan dan kelebihan barang.</p></div>
+        <div><h3 data-en="Accounting &amp; Finance">Akuntansi &amp; Keuangan</h3><p data-en="Handles cash flow, profit and loss, tax and bookkeeping automatically.">Mengelola arus kas, laba rugi, pajak, dan pembukuan secara otomatis.</p></div>
+        <div><h3 data-en="Customer Relationship (CRM)">Hubungan Pelanggan (CRM)</h3><p data-en="Keeps customer history and raises retention with targeted follow-ups.">Menyimpan riwayat pelanggan dan menaikkan retensi lewat tindak lanjut yang tepat.</p></div>
+        <div><h3 data-en="Human Resources (HRIS)">Sumber Daya Manusia (HRIS)</h3><p data-en="Employee data, attendance, payroll, leave and performance in one place.">Data karyawan, absensi, gaji, cuti, dan kinerja dalam satu tempat.</p></div>
+        <div><h3 data-en="Enterprise Planning (ERP)">Perencanaan Perusahaan (ERP)</h3><p data-en="Connects finance, stock, production and HR on one central platform.">Menyatukan keuangan, stok, produksi, dan SDM dalam satu platform pusat.</p></div>
+        <div><h3 data-en="AI agents and AI integration">Agen AI dan integrasi AI</h3><p data-en="AI customer service with full product knowledge that can prospect new customers.">Layanan pelanggan AI dengan pengetahuan produk penuh yang bisa menjangkau pelanggan baru.</p></div>
+        <div><h3 data-en="Supply Chain (SCM)">Rantai Pasok (SCM)</h3><p data-en="Moves goods from suppliers to customers efficiently.">Mengatur aliran barang dari pemasok sampai ke pelanggan secara efisien.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap">
+      <div class="stack">
+        <h2 class="h2" data-en="Built by Singkrona.">Dibangun oleh Singkrona.</h2>
+        <p class="lead" data-en="Every project starts by listening to the problem. We find the solution, then deliver it as branding, apps and systems.">Setiap project dimulai dari mendengar masalah. Kami mencari solusinya, lalu mewujudkannya dalam bentuk branding, aplikasi, dan sistem.</p>
+      </div>
+      <div class="rail" data-portfolio></div>
+      <p style="margin-top:28px"><a class="more" href="#project" data-en="See all projects →">Lihat semua project →</a></p>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap stack">
+      <blockquote class="quote" data-en="“Their attention to detail and commitment to quality truly stood out. We’ve already recommended them to others.”">“Perhatian mereka pada detail dan komitmen pada kualitas sangat menonjol. Kami sudah merekomendasikan mereka kepada yang lain.”</blockquote>
+      <p class="eyebrow" data-en="Former customer">Pelanggan terdahulu</p>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap close">
+      <h2 class="h2" data-en="Tell us what you’re facing. We’re ready to build.">Ceritakan yang Anda hadapi. Kami siap membangunnya.</h2>
+      <a class="btn btn-k" href="https://wa.me/6281808001811" target="_blank" rel="noopener" data-en="Chat on WhatsApp">Chat di WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<!-- THINKER -->
+<main data-view="thinker" hidden>
+  <section class="open-photo">
+    <img src="img/hero-play.webp" alt="Anak perempuan berjubah kuning melompat seperti superhero di ruang keluarga" data-en-alt="A girl in a yellow cape leaping like a superhero in the living room" style="object-position:40% 38%">
+    <div class="wrap">
+      <p class="eyebrow" style="color:#fff" data-en="How we create">Bagaimana kami menciptakan</p>
+      <h1 data-en="We ask questions like a child does.">Kami bertanya seperti anak kecil.</h1>
+      <p data-en="Why doesn’t the stock match? Why is the cashier staying late? Why does the report only arrive on the 5th? We keep asking until the root of the problem shows.">Kenapa stok selisih? Kenapa kasir pulang larut? Kenapa laporan baru jadi tanggal 5? Kami terus bertanya sampai akar masalahnya terlihat.</p>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <p class="say" data-en="Software is the last thing we think about. First we watch how your people actually work, where the money moves, and where it gets stuck. Only then do we write a line of code.">Perangkat lunak adalah hal terakhir yang kami pikirkan. Kami lebih dulu melihat cara tim Anda bekerja, ke mana uang bergerak, dan di mana ia tersangkut. Setelah itu baru kami menulis kode.</p>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap proc">
+      <div class="proc-side">
+        <h2 class="h2" data-en="Six steps from question to running system.">Enam langkah dari pertanyaan sampai sistem berjalan.</h2>
+        <p class="lead" data-en="Each step ends with something you can see and check.">Setiap langkah berakhir dengan sesuatu yang bisa Anda lihat dan periksa.</p>
+      </div>
+      <ol class="steps">
+        <li><div><h3 data-en="Listen">Mendengar</h3><p data-en="We sit with the owner, the cashier and the warehouse staff, and note what slows them down.">Kami duduk bersama pemilik, kasir, dan staf gudang, lalu mencatat apa yang memperlambat mereka.</p><small data-en="You get: a list of real problems">Anda dapat: daftar masalah nyata</small></div></li>
+        <li><div><h3 data-en="Map">Memetakan</h3><p data-en="We draw how orders, stock and money flow today, and mark where errors and fraud can enter.">Kami menggambar aliran pesanan, stok, dan uang hari ini, lalu menandai titik masuk kesalahan dan fraud.</p><small data-en="You get: a map of your operations">Anda dapat: peta operasional</small></div></li>
+        <li><div><h3 data-en="Design">Merancang</h3><p data-en="We design screens with the people who will use them, and pick the architecture that fits the load.">Kami merancang layar bersama orang yang akan memakainya, dan memilih arsitektur yang sesuai beban kerja.</p><small data-en="You get: a prototype you can try">Anda dapat: prototipe yang bisa dicoba</small></div></li>
+        <li><div><h3 data-en="Build">Membangun</h3><p data-en="We build in short cycles, so you see working software early and can change direction.">Kami membangun dalam siklus pendek, sehingga Anda melihat perangkat lunak yang berjalan sejak awal dan bisa mengubah arah.</p><small data-en="You get: regular working releases">Anda dapat: rilis berkala yang berjalan</small></div></li>
+        <li><div><h3 data-en="Test">Menguji</h3><p data-en="We try to break it: heavy traffic, wrong input, attempts to cheat the system.">Kami mencoba merusaknya: lalu lintas padat, input salah, dan upaya mengakali sistem.</p><small data-en="You get: a test report">Anda dapat: laporan pengujian</small></div></li>
+        <li><div><h3 data-en="Run and learn">Menjalankan dan belajar</h3><p data-en="We launch, train your team and watch the numbers. The system keeps improving with real data.">Kami meluncurkan, melatih tim Anda, dan memantau angka. Sistem terus membaik dengan data nyata.</p><small data-en="You get: a system that keeps growing">Anda dapat: sistem yang terus berkembang</small></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <img class="strip" src="img/picnic.webp" alt="Ibu dan anak perempuan berbaring di rumput sambil tersenyum" data-en-alt="A mother and daughter lying on the grass, smiling" loading="lazy">
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <h2 class="h2" data-en="What we hold ourselves to.">Yang kami pegang.</h2>
+      <div class="prin">
+        <div><h3 data-en="Simple at rush hour">Mudah saat jam sibuk</h3><p data-en="If a cashier can’t use it with a queue at the counter, the design isn’t finished.">Kalau kasir tidak bisa memakainya saat antrean panjang, desainnya belum selesai.</p></div>
+        <div><h3 data-en="Speed is respect">Cepat adalah bentuk hormat</h3><p data-en="Every second of waiting belongs to your staff and your customers. We protect it.">Setiap detik menunggu adalah milik staf dan pelanggan Anda. Kami menjaganya.</p></div>
+        <div><h3 data-en="Security from the first line">Aman sejak baris pertama</h3><p data-en="Access rights, encryption and audit trails go in at the start, because they’re hard to add later.">Hak akses, enkripsi, dan jejak audit dipasang sejak awal, karena sulit ditambahkan belakangan.</p></div>
+        <div><h3 data-en="Built to grow">Dibuat untuk tumbuh</h3><p data-en="One outlet today, twenty later. The system should grow with you without a rebuild.">Satu outlet hari ini, dua puluh nanti. Sistem harus ikut tumbuh tanpa dibangun ulang.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <h2 class="h2" data-en="Made this way.">Lahir dari cara ini.</h2>
+      <ul class="names" data-names></ul>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap close">
+      <h2 class="h2" data-en="Bring us your hardest question.">Bawa pertanyaan tersulit Anda.</h2>
+      <a class="btn btn-k" href="https://wa.me/6281808001811" target="_blank" rel="noopener" data-en="Chat on WhatsApp">Chat di WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<!-- TECH -->
+<main data-view="tech" hidden>
+  <section class="open-tech">
+    <canvas id="sync" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <h1 data-en="Every part of your business, in one rhythm.">Semua bagian usaha, dalam satu irama.</h1>
+      <p data-en="These dots start out of step and find a shared rhythm. Our systems do the same with your sales, stock, finance and people.">Titik-titik ini mulai dari irama acak, lalu saling menyesuaikan. Sistem kami melakukan hal yang sama pada penjualan, stok, keuangan, dan orang.</p>
+      <div class="sync-ctl">
+        <span><span data-en="In sync">Selaras</span> <output id="sync-r">0%</output></span>
+        <button type="button" id="sync-reset" data-en="Scatter again">Acak lagi</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap split">
+      <div class="stack">
+        <p class="eyebrow" data-en="Cloud computing">Komputasi cloud</p>
+        <h2 class="h2" data-en="Your office is now everywhere.">Kantor Anda kini ada di mana-mana.</h2>
+        <p class="lead" data-en="Cloud means your system runs on data centres built for it, instead of a computer in the back room. It stays on when the power goes out at the shop.">Cloud berarti sistem Anda berjalan di pusat data yang dibuat khusus, menggantikan komputer di ruang belakang. Sistem tetap menyala saat listrik toko padam.</p>
+      </div>
+      <ul class="facts">
+        <li><h3 data-en="Grows with the rush">Membesar saat ramai</h3><p data-en="Capacity rises at peak hours and falls when it’s quiet, so you pay for what you use.">Kapasitas naik saat jam sibuk dan turun saat sepi, sehingga Anda membayar sesuai pemakaian.</p></li>
+        <li><h3 data-en="Opens from anywhere">Terbuka dari mana saja</h3><p data-en="Every branch sees the same numbers at the same moment.">Setiap cabang melihat angka yang sama pada saat yang sama.</p></li>
+        <li><h3 data-en="Backed up automatically">Cadangan otomatis</h3><p data-en="Data is copied regularly, so a broken device never means lost records.">Data disalin berkala, sehingga perangkat rusak tidak berarti catatan hilang.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap">
+      <div class="stack">
+        <p class="eyebrow">Artificial intelligence</p>
+        <h2 class="h2" data-en="AI that works inside your operations.">AI yang bekerja di dalam operasional Anda.</h2>
+        <p class="lead" data-en="Work gets more efficient, processes stay controlled, and customers are answered faster.">Kerja lebih efisien, proses lebih terkontrol, dan pelanggan lebih cepat direspons.</p>
+      </div>
+      <ul class="ai">
+        <li><h3 data-en="Customer service chatbot">Chatbot layanan pelanggan</h3><p data-en="Answers questions all day with your own product knowledge.">Menjawab pertanyaan sepanjang hari dengan pengetahuan produk Anda.</p></li>
+        <li><h3 data-en="Recommendation engine">Rekomendasi produk</h3><p data-en="Suggests what each customer is likely to buy next.">Menyarankan apa yang kemungkinan dibeli pelanggan berikutnya.</p></li>
+        <li><h3 data-en="Predictive analytics">Analisis prediktif</h3><p data-en="Reads past sales to estimate demand before you order stock.">Membaca penjualan lalu untuk memperkirakan permintaan sebelum Anda memesan stok.</p></li>
+        <li><h3 data-en="Anomaly detection">Deteksi anomali</h3><p data-en="Machine learning spots transactions that break the usual pattern.">Machine learning menemukan transaksi yang keluar dari pola biasa.</p></li>
+        <li><h3 data-en="Workflow automation (RPA)">Otomasi alur kerja (RPA)</h3><p data-en="Takes over the repeated typing, copying and reconciling.">Mengambil alih pekerjaan mengetik, menyalin, dan mencocokkan yang berulang.</p></li>
+        <li><h3 data-en="Document OCR">OCR dokumen</h3><p data-en="Turns invoices and paper records into searchable data.">Mengubah faktur dan catatan kertas menjadi data yang bisa dicari.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <div class="stack">
+        <p class="eyebrow" data-en="Fraud prevention">Pencegahan fraud</p>
+        <h2 class="h2" data-en="How a suspicious transaction gets stopped.">Cara transaksi mencurigakan dihentikan.</h2>
+      </div>
+      <ol class="pipe">
+        <li><h3 data-en="Record">Mencatat</h3><p data-en="Every sale, void, refund and stock movement is logged.">Setiap penjualan, void, refund, dan pergerakan stok dicatat.</p></li>
+        <li><h3 data-en="Compare">Membandingkan</h3><p data-en="The event is set against the usual pattern for that outlet, person and hour.">Kejadian dibandingkan dengan pola biasa untuk outlet, orang, dan jam itu.</p></li>
+        <li><h3 data-en="Score">Menilai</h3><p data-en="Rules and machine learning give it a risk score.">Aturan dan machine learning memberi skor risiko.</p></li>
+        <li><h3 data-en="Alert">Memperingatkan</h3><p data-en="High scores hold the action and reach the manager straight away.">Skor tinggi menahan tindakan dan langsung sampai ke manajer.</p></li>
+        <li><h3 data-en="Audit">Mengaudit</h3><p data-en="The decision and its reasons stay in a trail nobody can edit.">Keputusan dan alasannya tersimpan dalam jejak yang tidak bisa diubah.</p></li>
+      </ol>
+      <p style="margin-top:44px"><a class="more" href="#demo" data-goto="demo" data-en="Try the fraud simulation →">Coba simulasi fraud →</a></p>
+    </div>
+  </section>
+
+  <section class="band b-ink" style="padding-top:0">
+    <div class="wrap split">
+      <h2 class="h2" data-en="Why Singkrona.">Mengapa Singkrona.</h2>
+      <div class="stack">
+        <p style="font-size:var(--s3);font-weight:700;line-height:1.12;letter-spacing:-.03em" data-en="We harness the power of <span class='rust-mark'>Rust</span> to build cloud systems on a new level.">Kami memakai kekuatan <span class="rust-mark">Rust</span> untuk membangun sistem cloud di level baru.</p>
+        <p class="lead" data-en="Mozilla, Discord, Dropbox, Microsoft and Cloudflare trust this language to power systems serving millions of users. For businesses that can’t afford downtime, for financial systems where every millisecond counts, and for fraud detection that has to work at lightning speed, Rust keeps systems fast, stable and resilient under the heaviest traffic.">Mozilla, Discord, Dropbox, Microsoft, dan Cloudflare memercayakan sistem yang melayani jutaan pengguna pada bahasa ini. Bagi usaha yang tidak boleh berhenti, sistem keuangan yang menghitung setiap milidetik, dan deteksi fraud yang harus secepat kilat, Rust menjaga sistem tetap cepat, stabil, dan tangguh di lalu lintas terpadat.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <h2 class="h2" data-en="The tools we build with.">Alat yang kami pakai.</h2>
+      <ul class="tech-rows">
+        <li><span class="eyebrow">Backend</span><p>Rust, Golang, Node.js, Python, Java, PHP</p></li>
+        <li><span class="eyebrow">Web</span><p>React.js, Next.js, Vue.js, Angular</p></li>
+        <li><span class="eyebrow">Mobile</span><p>Flutter, React Native, Android, iOS</p></li>
+        <li><span class="eyebrow" data-en="Data">Data</span><p>PostgreSQL, MySQL, MongoDB, Redis, Firebase, Supabase</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap">
+      <h2 class="h2" data-en="Everything we can build.">Semua yang bisa kami bangun.</h2>
+      <div class="cat">
+        <div><h3 data-en="Business and operations">Bisnis &amp; operasional</h3><ul>
+          <li data-en="Warehouse Management (WMS)">Manajemen Gudang (WMS)</li>
+          <li data-en="Asset Management">Manajemen Aset</li>
+          <li data-en="Contract Management">Manajemen Kontrak</li>
+          <li data-en="Ticketing and Helpdesk">Ticketing dan Helpdesk</li>
+          <li data-en="Booking and Reservations">Booking dan Reservasi</li>
+          <li data-en="Document Management">Manajemen Dokumen</li>
+          <li data-en="Vendor and Supplier Management">Manajemen Vendor dan Supplier</li>
+          <li data-en="Clinic and Hospital Management">Manajemen Klinik dan Rumah Sakit</li>
+          <li data-en="School and Campus Management">Manajemen Sekolah dan Kampus</li>
+          <li data-en="Property Management">Manajemen Properti</li>
+          <li data-en="Restaurant Management">Manajemen Restoran</li>
+          <li data-en="Rental Management">Manajemen Rental dan Sewa</li>
+        </ul></div>
+        <div class="cat-col">
+          <div><h3 data-en="AI and automation">AI &amp; otomasi</h3><ul>
+            <li data-en="Customer service AI chatbot">Chatbot AI layanan pelanggan</li>
+            <li data-en="Recommendation engine">Sistem rekomendasi produk</li>
+            <li data-en="Predictive analytics">Analisis prediktif</li>
+            <li data-en="Anomaly detection with machine learning">Deteksi anomali dengan machine learning</li>
+            <li data-en="Workflow automation (RPA)">Otomasi alur kerja (RPA)</li>
+            <li data-en="OCR for document digitisation">OCR untuk digitalisasi dokumen</li>
+          </ul></div>
+        </div>
+        <div class="cat-col">
+          <div><h3 data-en="Security and authentication">Keamanan &amp; autentikasi</h3><ul>
+            <li>Single Sign-On (SSO)</li>
+            <li data-en="Identity and Access Management (IAM)">Manajemen Identitas dan Akses (IAM)</li>
+            <li data-en="Data encryption and security">Enkripsi dan keamanan data</li>
+            <li data-en="Audit trail and logging">Audit trail dan logging</li>
+          </ul></div>
+          <div><h3 data-en="Mobile and web apps">Aplikasi mobile &amp; web</h3><ul>
+            <li data-en="Android and iOS apps">Aplikasi Android dan iOS</li>
+            <li>Progressive Web App (PWA)</li>
+            <li data-en="IoT integration">Integrasi IoT</li>
+            <li data-en="Real-time GPS and logistics tracking">Pelacakan GPS dan logistik real time</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <h2 class="h2" data-en="Running on this technology.">Berjalan dengan teknologi ini.</h2>
+      <ul class="names" data-names></ul>
+    </div>
+  </section>
+</main>
+
+<!-- ABOUT -->
+<main data-view="about" hidden>
+  <section class="open-split">
+    <div>
+      <p class="eyebrow" style="color:var(--smoke)">PT Singkrona Digital Indonesia</p>
+      <h1 data-en="Built in Bali, for the next generation.">Dibangun di Bali, untuk generasi berikutnya.</h1>
+      <p data-en="We are a technology company making cloud systems, AI and apps for businesses that want to last.">Kami perusahaan teknologi yang membuat sistem cloud, AI, dan aplikasi untuk usaha yang ingin bertahan lama.</p>
+    </div>
+    <img src="img/heart.webp" alt="Sekelompok anak muda tertawa dan membentuk hati dengan tangan saat matahari terbenam" data-en-alt="A group of young people laughing and making a heart with their hands at sunset">
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <p class="say" data-en="Every business owner we meet wants the same thing: to know what is really happening, to trust the numbers, and to leave something good behind. We build the technology that makes that possible.">Setiap pemilik usaha yang kami temui menginginkan hal yang sama: tahu apa yang benar-benar terjadi, percaya pada angkanya, dan meninggalkan sesuatu yang baik. Kami membangun teknologi yang memungkinkan itu.</p>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap split">
+      <h2 class="h2" data-en="What we do.">Yang kami kerjakan.</h2>
+      <ul class="srv" style="grid-template-columns:minmax(0,1fr)">
+        <li data-en="Software Engineering">Software Engineering</li>
+        <li data-en="Mobile App Development">Pengembangan Aplikasi Mobile</li>
+        <li data-en="Social Media">Media Sosial</li>
+        <li data-en="Creative Services">Layanan Kreatif</li>
+        <li data-en="Internet Marketing">Internet Marketing</li>
+        <li data-en="Hardware Support">Dukungan Perangkat Keras</li>
+        <li data-en="Network Installation">Instalasi Jaringan</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <p class="eyebrow">Dev by Singkrona</p>
+      <div class="prods"><span>Lyxvo AI</span><span>Singkroflow</span><span>Hikrona Class</span><span>Hikrona Club</span><span>Reservona</span></div>
+      <div class="rail" data-portfolio style="margin-top:clamp(48px,7vw,84px)"></div>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap">
+      <div class="close">
+        <h2 class="h2" data-en="Come and talk to us.">Mari berbicara.</h2>
+        <a class="btn btn-w" href="https://wa.me/6281808001811" target="_blank" rel="noopener" data-en="Chat on WhatsApp">Chat di WhatsApp</a>
+      </div>
+      <div class="contact">
+        <div><h3 data-en="Office">Kantor</h3><p>Jln. Sunset Road, Gang Made,<br>Seminyak, Kuta, Bali</p></div>
+        <div><h3 data-en="Phone">Telepon</h3><p id="c-phone">+62 818-0800-1811</p><button class="copy" type="button" data-copy="c-phone" data-en="Copy number">Salin nomor</button></div>
+        <div><h3>Email</h3><p id="c-mail">mail@singkrona.com</p><button class="copy" type="button" data-copy="c-mail" data-en="Copy email">Salin email</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- PROJECT -->
+<main data-view="project" hidden></main>
+
+<!-- SECURITY -->
+<main data-view="security" hidden>
+  <section class="sec-open">
+    <div class="wrap sec-g">
+      <div class="stack">
+        <p class="eyebrow">Lyxvo Security</p>
+        <h1 data-en="Attacks stop before they reach your app.">Serangan berhenti sebelum sampai ke aplikasi Anda.</h1>
+        <p class="lead" data-en="Lyxvo WAF blocks scanners, injection attacks and floods at the door. Lyxvo Captcha keeps bots out of forms without puzzles or tracking.">Lyxvo WAF memblokir pemindai, serangan injeksi, dan banjir trafik di depan pintu. Lyxvo Captcha menahan bot di formulir tanpa teka-teki dan tanpa pelacakan.</p>
+        <div class="cta-row"><a class="btn btn-w" href="https://security.lyxvo.ai/" target="_blank" rel="noopener" data-en="Visit security.lyxvo.ai">Buka security.lyxvo.ai</a></div>
+      </div>
+      <div class="sec-panel">
+        <div class="sec-head"><span data-en="Blocked requests">Permintaan diblokir</span><span data-en="Example view">Contoh tampilan</span></div>
+        <div class="sec-log" aria-hidden="true"><div class="sec-t" id="sec-t"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mq-w" aria-label="Jenis serangan yang dikenali" data-en-aria="Attack types recognised">
+    <div class="mq" style="--d:48s"><div class="mq-t"><div><span>SQL injection</span><span>XSS</span><span>Path traversal</span><span>Command injection</span><span>SSRF</span><span>XXE</span><span>Template injection</span><span>Log4Shell</span><span>NoSQL injection</span><span>PHP wrappers</span></div><div aria-hidden="true"><span>SQL injection</span><span>XSS</span><span>Path traversal</span><span>Command injection</span><span>SSRF</span><span>XXE</span><span>Template injection</span><span>Log4Shell</span><span>NoSQL injection</span><span>PHP wrappers</span></div></div></div>
+    <div class="mq rev" style="--d:40s"><div class="mq-t"><div><span>sqlmap</span><span>Nikto</span><span>Nuclei</span><span>ZAP</span><span>Acunetix</span><span>.env</span><span>.git</span><span>backups</span><span>CMS panels</span></div><div aria-hidden="true"><span>sqlmap</span><span>Nikto</span><span>Nuclei</span><span>ZAP</span><span>Acunetix</span><span>.env</span><span>.git</span><span>backups</span><span>CMS panels</span></div></div></div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap">
+      <h2 class="h2 pj-h" data-en="What guards your site.">Yang menjaga situs Anda.</h2>
+      <ul class="pj-grid n6">
+        <li><h3 data-en="Attack signatures">Signature serangan</h3><p data-en="Detects SQL injection, XSS, path traversal, command injection, SSRF and more, matched on the decoded URL and body.">Mengenali SQL injection, XSS, path traversal, command injection, SSRF, dan lainnya, dicocokkan pada URL dan body yang sudah didekode.</p></li>
+        <li><h3 data-en="Scanner and bot traps">Perangkap pemindai dan bot</h3><p data-en="Identifies sqlmap, Nikto, Nuclei, ZAP, Acunetix and 40 other tools. Probes for .env, .git, backups and CMS panels are trapped.">Mengenali sqlmap, Nikto, Nuclei, ZAP, Acunetix, dan 40 alat lain. Upaya mencari .env, .git, backup, dan panel CMS langsung terperangkap.</p></li>
+        <li><h3 data-en="IP scoring and blocking">Skor dan blokir IP</h3><p data-en="Each finding raises the IP’s score. A real payload blocks at once, weaker signals add up within 15 minutes, and floods trigger a one-hour block.">Setiap temuan menaikkan skor IP. Payload nyata langsung diblokir, sinyal lemah terakumulasi dalam 15 menit, dan banjir trafik memicu blokir satu jam.</p></li>
+        <li><h3 data-en="Custom rules">Aturan sendiri</h3><p data-en="Allow and block lists, country blocking, a requests-per-minute limit, and a monitor mode that logs without blocking.">Daftar izin dan blokir, blokir negara, batas permintaan per menit, dan mode monitor yang mencatat tanpa memblokir.</p></li>
+        <li><h3>Lyxvo Captcha</h3><p data-en="The visitor’s browser solves a small proof-of-work in about a second. No image puzzles, cookies or third-party tracking.">Browser pengunjung menyelesaikan proof-of-work kecil dalam sekitar satu detik. Tanpa teka-teki gambar, cookie, atau pelacakan pihak ketiga.</p></li>
+        <li><h3>Dashboard</h3><p data-en="Every blocked request with IP, country, path and attack type, plus attacks per day, top attackers and one-click unblocking.">Setiap permintaan yang diblokir beserta IP, negara, path, dan jenis serangan, ditambah serangan per hari, penyerang teratas, dan buka blokir sekali klik.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-mist">
+    <div class="wrap">
+      <h2 class="h2 pj-h" data-en="One API call and one script tag.">Satu panggilan API dan satu tag script.</h2>
+      <ol class="sec-steps">
+        <li><h3 data-en="Add your site">Daftarkan situs</h3><p data-en="Register your domain to get a public site key and a server-only secret key.">Daftarkan domain untuk mendapat site key publik dan secret key khusus server.</p></li>
+        <li><h3 data-en="Call the check">Panggil pemeriksaan</h3><p data-en="Your server sends each request’s IP, method, URL and headers, then refuses anything answered with block.">Server mengirim IP, metode, URL, dan header setiap permintaan, lalu menolak yang dijawab block.</p><code>POST /api/security/check</code></li>
+        <li><h3 data-en="Add the captcha">Pasang captcha</h3><p data-en="Place the widget in your form and verify its token on the server with your secret key.">Pasang widget di formulir, lalu verifikasi tokennya di server dengan secret key.</p><code>captcha.js</code></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band b-ink">
+    <div class="wrap split">
+      <h2 class="h2" data-en="Safe to switch on.">Aman untuk diaktifkan.</h2>
+      <ul class="facts">
+        <li><h3 data-en="Start in monitor mode">Mulai dari mode monitor</h3><p data-en="See what would be blocked first, then switch to block.">Lihat dulu apa yang akan diblokir, lalu beralih ke mode blokir.</p></li>
+        <li><h3 data-en="Fails open">Tetap berjalan saat gangguan</h3><p data-en="If the check doesn’t respond within a short timeout, the request proceeds, so your site stays up.">Kalau pemeriksaan tidak menjawab dalam batas waktu singkat, permintaan tetap diteruskan, sehingga situs tidak berhenti.</p></li>
+        <li><h3 data-en="Signed, single-use tokens">Token bertanda tangan, sekali pakai</h3><p data-en="Captcha tokens expire after 5 minutes.">Token captcha kedaluwarsa setelah 5 menit.</p></li>
+        <li><h3 data-en="Works with your stack">Cocok dengan teknologi Anda</h3><p>Node, Next.js, PHP, Laravel, WordPress, Python, Go, Ruby, Cloudflare Workers</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band b-paper">
+    <div class="wrap close">
+      <h2 class="h2" data-en="Want this protecting your system?">Ingin sistem Anda dilindungi seperti ini?</h2>
+      <a class="btn btn-k" href="https://wa.me/6281808001811" target="_blank" rel="noopener" data-en="Chat on WhatsApp">Chat di WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div class="wrap foot-g">
+      <div>
+        <img class="foot-logo" src="img/logo.png" alt="Singkrona" loading="lazy">
+        <p>Jln. Sunset Road, Gang Made,<br>Seminyak, Kuta, Bali</p>
+        <p>+62 818-0800-1811<br>mail@singkrona.com</p>
+      </div>
+      <div>
+        <h3 data-en="Explore">Jelajahi</h3>
+        <ul><li><a href="#home">Home</a></li><li><a href="#thinker">Thinker</a></li><li><a href="#tech">Tech</a></li><li><a href="#project">Project</a></li><li><a href="#security">Security</a></li><li><a href="#about">About</a></li></ul>
+      </div>
+      <div>
+        <h3>Project</h3>
+        <ul><li><a href="#jolafy">Jolafy</a></li><li><a href="#hikrona">Hikrona</a></li><li><a href="#otoroads">Otoroads</a></li><li><a href="#kawan-ojol">Kawan Ojol</a></li><li><a href="#trihita">Trihita Ride Hailing</a></li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="legal"><div class="wrap"><span>PT Singkrona Digital Indonesia</span><span>Seminyak, Bali</span></div></div>
+</footer>
+
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Layar aplikasi"><button type="button" class="lb-b" id="lb-p" aria-label="Sebelumnya">←</button><div id="lb-v"><div id="lb-top"><b id="lb-c"></b><span id="lb-i"></span></div><div id="lb-s" tabindex="0"><img id="lb-img" alt=""></div></div><button type="button" class="lb-b" id="lb-n" aria-label="Berikutnya">→</button><button type="button" class="lb-b" id="lb-x" aria-label="Tutup">×</button></div>
+
+<script>
+(function(){
+'use strict';
+var root=document.documentElement;root.classList.add('js');
+var $=function(s,c){return (c||document).querySelector(s)},$$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var lang=store.get('sk-lang')==='en'?'en':'id';
+var T=function(id,en){return lang==='en'?en:id};
+
+/* Project */
+var P=[
+ {id:'jolafy',n:'Jolafy',img:'scooter',pos:'38% 40%',hero:'surf',hpos:'62% 50%',c:'#2D52FF',lg:'lg-jolafy',t:['Rental · Bali','Rental · Bali'],
+  d:['Sewa skuter, mobil, dan perlengkapan liburan di Bali.','Scooter, car and holiday gear rental in Bali.'],
+  a:['Perempuan menyiapkan papan selancar dari bagasi mobil di pantai','A woman unloading a surfboard from a car at the beach'],
+  h:['Bebas ke mana saja di Bali.','Go anywhere in Bali.'],
+  l:['Aplikasi sewa skuter, mobil, dan perlengkapan liburan, diantar dan dijemput di lokasi Anda.','An app for renting scooters, cars and holiday gear, delivered to and collected from where you are.'],
+  s:{h:['Tiga aplikasi, satu rental.','Three apps, one rental business.'],x:[
+   [['Aplikasi pelanggan','Customer app'],['Cari unit, pesan, tambah add-on dan perlindungan, lalu pantau tiket pesanan.','Find a unit, book, add extras and protection, then follow your booking ticket.']],
+   [['Jolafy Mitra','Jolafy Partner'],['Vendor rental mengelola order, pengiriman, kalender unit, catatan service, dan kas.','Rental vendors manage orders, delivery, unit calendars, service records and cash.']],
+   [['Dashboard admin','Admin dashboard'],['Tim Jolafy memantau transaksi, verifikasi, pencairan, refund, sengketa, dan komisi per mitra.','The Jolafy team oversees transactions, verification, payouts, refunds, disputes and commission per partner.']]]},
+  f:{h:['Semua yang dibutuhkan untuk liburan.','Everything a holiday needs.'],chips:[['Scooter Fuel','Fuel scooter'],['Scooter EV','EV scooter'],['Mobil Fuel','Fuel car'],['Mobil EV','EV car'],['Speaker','Speaker'],['Floaties','Floaties'],['Baby Cot','Baby cot'],['Stroller','Stroller'],['Power Station','Power station'],['Kamera','Camera']]},
+  o:{e:['Kro Club','Kro Club'],h:['Setiap sewa menjadi poin.','Every rental earns points.'],l:['Rp1.000 belanja bernilai 1 poin. Poin bisa ditukar dengan helm ekstra, potongan harga, atau upgrade perlindungan. Jolafy Bible melengkapinya dengan rekomendasi Bali dari warga lokal dan traveler.','Every Rp1,000 spent earns 1 point. Points convert into an extra helmet, a discount or a protection upgrade. Jolafy Bible adds Bali recommendations from locals and travellers.'],x:[
+   [['Blue','Blue'],['Level awal','Starting level']],[['Wave','Wave'],['Level menengah','Middle level']],[['Island','Island'],['Level tertinggi','Top level']]]}},
+ {id:'hikrona',n:'Hikrona',img:'school',pos:'42% 50%',hero:'school',hpos:'46% 50%',c:'#004AAD',lg:'lg-hikrona',lc:'r',t:['Sistem sekolah','School system'],
+  d:['Sistem super sekolah: absensi, e-learning, rapor, dan pembayaran.','A school super system: attendance, e-learning, reports and payments.'],
+  a:['Siswa bercengkerama di tangga sekolah','Students chatting on the school steps'],
+  h:['Modernisasi sekolah, dalam satu sistem.','Modern schools, in one system.'],
+  l:['Absensi, e-learning, rapor, pembayaran, dan komunikasi untuk sekolah, siswa, wali, dan guru.','Attendance, e-learning, report cards, payments and communication for schools, students, parents and teachers.'],
+  site:'https://www.hikrona.com',
+  p:{h:['Banyak urusan sekolah masih berjalan di atas kertas.','Too much of school still runs on paper.'],x:[
+   [['Absensi manual','Manual attendance'],['Daftar hadir kertas mudah dititipkan, lambat direkap, dan sulit diverifikasi.','Paper registers are easy to fake, slow to total and hard to verify.']],
+   [['Informasi tercecer','Scattered information'],['Pengumuman, izin, dan kabar anak tersebar di grup chat dan surat.','Announcements, permissions and news get lost across chat groups and letters.']],
+   [['Tugas dan rapor terpisah','Separate work and reports'],['Materi, tugas, dan nilai dikelola di tempat berbeda.','Lessons, assignments and grades sit in different places.']],
+   [['Keuangan manual','Manual finance'],['Tagihan SPP, kuitansi, dan slip gaji dicatat satu per satu.','Fees, receipts and payslips are recorded one at a time.']]]},
+  s:{h:['Satu platform, dua pintu masuk.','One platform, two ways in.'],x:[
+   [['Dashboard web','Web dashboard'],['Kepala sekolah, tata usaha, dan admin mengelola data, jadwal, keuangan, persetujuan, dan akses pengguna.','Principals, office staff and admins manage data, schedules, finance, approvals and user access.']],
+   [['Aplikasi mobile','Mobile app'],['Siswa, wali, guru mapel, dan wali kelas masuk dengan ID sesuai peran, dan menunya menyesuaikan.','Students, parents, subject and homeroom teachers log in with a role-based ID, and the menu adapts.']]]},
+  f:{h:['18 fitur yang saling terhubung.','18 connected features.'],chips:[['E-learning','E-learning'],['Absensi','Attendance'],['Siswa &amp; Wali','Students &amp; Parents'],['Kelas','Classes'],['Guru','Teachers'],['Jadwal Mapel','Timetable'],['Info &amp; News','Info &amp; News'],['Izin Staff','Staff Leave'],['Izin Siswa','Student Leave'],['Role User','User Roles'],['Kalender Akademik','Academic Calendar'],['Nilai &amp; Sikap','Grades &amp; Conduct'],['E-Rapor','E-Report'],['Payment','Payment'],['Payout','Payout'],['Pengumuman','Announcements'],['Conference','Conference'],['Live Chat','Live Chat']]},
+  o:{e:['Dampak','Impact'],h:['Dari sibuk mengurus administrasi, menjadi fokus pada pendidikan.','From busy with admin to focused on education.'],l:['Hikrona mengambil alih pekerjaan berulang, sehingga waktu guru, staf, dan kepala sekolah kembali untuk siswa.','Hikrona takes over the repeated work, so teachers, staff and principals get their time back for students.'],x:[
+   [['Guru fokus mengajar','Teachers focus on teaching'],['Rekap absen, nilai pilihan ganda, dan rapor tersusun otomatis.','Attendance totals, multiple-choice marks and reports build themselves.']],
+   [['Orang tua terlibat','Parents stay involved'],['Kehadiran, izin, nilai, dan tagihan anak terlihat di ponsel.','Attendance, leave, grades and bills show on the phone.']],
+   [['Sekolah tanpa kertas','A paperless school'],['Surat izin, rapor, kuitansi, dan pengumuman berpindah ke digital.','Leave letters, reports, receipts and notices move to digital.']]]}},
+ {id:'otoroads',n:'Otoroads',img:'suv',pos:'50% 62%',hero:'suv',hpos:'50% 66%',c:'#E10600',lg:'lg-otoroads',t:['Otomotif · Bali','Automotive · Bali'],
+  d:['Servis, jual beli, kredit, dan Samsat dalam satu aplikasi.','Servicing, buying, selling, credit and Samsat in one app.'],
+  a:['Dua anak gembira di dalam SUV saat hujan','Two happy children inside an SUV in the rain'],
+  h:['Satu aplikasi untuk merawat, membeli, dan menjual kendaraan.','One app to care for, buy and sell your vehicle.'],
+  l:['Bengkel panggilan, showroom motor dan mobil, kredit, dan Samsat online, dimulai dari Bali.','On-call mechanics, a motorbike and car showroom, credit and online Samsat, starting in Bali.'],
+  p:{h:['Urusan kendaraan masih tercecer dan makan waktu.','Vehicle errands are scattered and slow.'],x:[
+   [['Servis berarti antre','Service means queueing'],['Pemilik harus ke bengkel dan menunggu, padahal kendaraan adalah alat kerja harian.','Owners have to go to the workshop and wait, though the vehicle is their daily work tool.']],
+   [['Jual beli bekas penuh risiko','Used sales are risky'],['Kondisi unit dan kelengkapan surat sulit dicek.','Condition and paperwork are hard to verify.']],
+   [['Layanan terpisah-pisah','Services are scattered'],['Dealer, leasing, bengkel, dan Samsat berada di tempat berbeda.','Dealers, leasing, workshops and Samsat all sit in different places.']]]},
+  s:{h:['Tiga layanan, satu aplikasi.','Three services, one app.'],x:[
+   [['Bengkel Siaga','Bengkel Siaga'],['Mekanik datang ke lokasi untuk servis rutin, ganti oli, aki, dan ban.','A mechanic comes to you for routine service, oil, battery and tyres.']],
+   [['Showroom','Showroom'],['Motor dan mobil baru maupun bekas lolos inspeksi, dibayar tunai, COD, atau kredit lewat kreditur mitra.','New and inspected used bikes and cars, paid by cash, COD or credit through partner lenders.']],
+   [['Layanan kendaraan','Vehicle services'],['Titip jual kendaraan, perpanjang STNK, dan membership servis Otoroads Care.','Consignment sales, STNK renewal and the Otoroads Care service membership.']]]},
+  f:{h:['Dikelola dari satu dashboard.','Run from one dashboard.'],chips:[['Order Bengkel NOW / NEXT','Bengkel NOW / NEXT orders'],['Klasifikasi teknisi','Technician classes'],['Stok bengkel','Workshop stock'],['Etalase motor &amp; mobil','Bike &amp; car listings'],['Review jual bekas','Used-sale review'],['Jadwal inspeksi','Inspection schedule'],['Portal kreditur','Lender portal'],['Banner &amp; artikel','Banners &amp; articles'],['Susunan promo','Promo layout']]},
+  o:{e:['Fitur Samsat motor','Motorbike Samsat'],h:['Perpanjang STNK tanpa antre.','Renew your STNK without the queue.'],l:['Berangkat dari kendaraan yang sudah tersimpan di Garasi aplikasi.','It starts from the vehicle already saved in the app’s Garage.'],steps:1,x:[
+   [['Pengingat jatuh tempo','Due-date reminder'],['Pajak tahunan dan ganti plat 5 tahunan.','Annual tax and 5-yearly plate change.']],
+   [['Cek dan bayar','Check and pay'],['Lihat rincian, bayar pajak plus biaya jasa.','See the details, pay the tax plus a service fee.']],
+   [['Kurir urus ke Samsat','Courier handles Samsat'],['Dokumen dijemput dan diproses lewat mitra resmi.','Documents are collected and processed through an official partner.']],
+   [['STNK diantar pulang','STNK delivered'],['STNK dan plat baru diantar ke alamat Anda.','The STNK and new plate arrive at your address.']]]}},
+ {id:'kawan-ojol',n:'Kawan Ojol',img:'ojol',pos:'50% 40%',hero:'ojol',hpos:'50% 30%',c:'#0B8040',lg:'lg-ojol',lc:'w',t:['Membership ojol','Driver membership'],
+  d:['Aplikasi keanggotaan ojol: perlindungan, tabungan, cashback, dan SOS.','A membership app for ojol drivers: protection, savings, cashback and SOS.'],
+  a:['Pengemudi ojek online berjaket dan berhelm hijau memeriksa ponsel','A ride-hailing driver in a green jacket and helmet checking his phone'],
+  h:['Kawan untuk setiap pengemudi ojol.','A friend for every ojol driver.'],
+  l:['Aplikasi keanggotaan dengan kartu anggota, perlindungan, tabungan masa depan, cashback, dan bantuan darurat.','A membership app with a member card, protection, future savings, cashback and emergency help.'],
+  s:{h:['Dua sisi, satu keanggotaan.','Two sides, one membership.'],x:[
+   [['Aplikasi anggota','Member app'],['Pengemudi mendaftar, memegang kartu anggota digital, dan memakai semua layanan dari ponsel.','Drivers register, carry a digital member card and use every service from the phone.']],
+   [['Panel admin','Admin panel'],['Kontrol menyeluruh atas anggota, verifikasi, perlindungan, tabungan, merchant, pembayaran, dan koordinator wilayah.','Full control of members, verification, protection, savings, merchants, payments and regional coordinators.']]]},
+  f:{h:['Layanan anggota.','Member services.'],x:[
+   [['Kartu Tanda Anggota','Member card'],['KTA digital dengan kode QR dan korwil.','A digital card with QR code and regional coordinator.']],
+   [['Perlindungan','Protection'],['Pilih program perlindungan langsung dari aplikasi.','Choose a protection plan right in the app.']],
+   [['Tabungan Masa Depan','Future Savings'],['Setor, pantau target, dan lihat riwayat.','Deposit, track your target and see your history.']],
+   [['Merchant','Merchants'],['Promo dari mitra, seperti servis motor hemat di bengkel.','Partner offers, such as cheaper servicing at workshops.']],
+   [['Cashback','Cashback'],['Cashback belanja yang tercatat dari nota.','Shopping cashback recorded from receipts.']],
+   [['Live Chat','Live Chat'],['Bantuan langsung dari tim Kawan Ojol.','Direct help from the Kawan Ojol team.']]]},
+  o:{e:['SOS','SOS'],h:['Satu tombol saat darurat.','One button for an emergency.'],l:['Tombol SOS berada di tengah navigasi. Pengemudi memilih jenis darurat, lalu tim admin menerima permintaannya di panel SOS dan Bantuan.','The SOS button sits at the centre of the navigation. A driver picks the type of emergency, and the admin team receives it in the SOS and Help panel.'],x:[]}},
+ {id:'trihita',n:'Trihita Ride Hailing',img:'trihita',pos:'50% 50%',hero:'trihita',hpos:'50% 40%',c:'#8A1616',lg:'lg-trihita',lc:'w',t:['Ride-hailing · Bali','Ride-hailing · Bali'],
+  d:['Ride-hailing untuk desa adat di Bali, dioperasikan oleh BUPDA.','Ride-hailing for Bali’s desa adat villages, operated by BUPDA.'],
+  a:['Pengemudi berpakaian adat Bali tersenyum di balik kemudi mobil','A driver in traditional Balinese dress smiling behind the wheel'],
+  h:['Ride-hailing dari desa, untuk desa.','Ride-hailing from the village, for the village.'],
+  l:['Aplikasi ride-hailing untuk desa adat di Bali, dengan BUPDA sebagai operator.','A ride-hailing app for Bali’s desa adat villages, with BUPDA as the operator.'],
+  s:{h:['Layanan Trihita.','Trihita services.'],x:[
+   [['Hita Bike','Hita Bike'],['Perjalanan dengan sepeda motor.','Rides by motorbike.']],
+   [['Hita Car','Hita Car'],['Perjalanan dengan mobil.','Rides by car.']],
+   [['Hita Mart','Hita Mart'],['Petani dan warga desa menjual langsung ke hotel, restoran, dan pengguna akhir.','Farmers and villagers sell directly to hotels, restaurants and end users.']]]},
+  f:{h:['Dua sisi, satu perjalanan.','Two sides of every trip.'],x:[[['Aplikasi penumpang','Passenger app'],['Cari pengemudi terdekat, pakai promo di setiap perjalanan, dan pantau pesanan dari satu layar.','Find drivers nearby, use a promo on every trip and follow your orders from one screen.']],[['Aplikasi mitra pengemudi','Driver partner app'],['Mitra mengatur status online, peta, pendapatan, dompet, dan chat, dengan pusat bantuan 24 jam.','Partners manage online status, map, earnings, wallet and chat, with a 24-hour help centre.']]]},
+  o:{img:'fabric',imga:['Kain tenun merah dan emas melayang di atas laut saat senja','A red and gold woven cloth floating above the sea at dusk'],e:['BUPDA','BUPDA'],h:['Dijalankan oleh desa adat.','Run by the desa adat.'],l:['BUPDA, badan usaha desa adat, menjadi operator layanan Trihita.','BUPDA, the business body of the desa adat, operates the Trihita service.'],x:[]}}
+];
+var APP={"trihita":[[["Penumpang dan mitra pengemudi","Passengers and driver partners"],[["passenger-drivers","Cari pengemudi terdekat","Find drivers nearby",1280],["passenger-friendly","Pesan kendaraan","Book a ride",1280],["passenger-promo","Promo dan pesanan","Promos and orders",1280],["driver-earn","Mitra: mode online","Partner: online mode",1280],["driver-account","Mitra: akun dan bantuan","Partner: account and help",1280]]]]};
+var SL={"jolafy":{"x":[["Main","Beranda","Home",1340],["Scooter","Scooter","Scooters",1240],["Detail","Detail skuter","Scooter details",1700],["Booking","Pemesanan dan add-on","Booking and add-ons",1980],["BookingTicket","Tiket pesanan","Booking ticket",1640],["Club","Akun dan Kro Club","Account and Kro Club",1720],["Bible","Jolafy Bible","Jolafy Bible",2320],["VendorHome","Beranda mitra","Partner home",2080]],"d":[["AdminDashboard","Ringkasan admin","Admin overview"],["AdminTransaksi","Transaksi dan detail order","Transactions and order details"]]},"otoroads":{"x":[["Main","Home","Home",2140],["CallMechanic","Panggil mekanik","Call a mechanic",1640],["Activity","Aktivitas","Activity",1180],["ServiceOil","Ganti oli","Oil change",2780],["UsedShowroom","Motor bekas","Used bikes",1900],["CreditPurchase","Simulasi kredit","Credit simulation",2640],["SellVehicle","Jual kendaraan","Sell a vehicle",3120],["Account","Akun dan garasi","Account and garage",1780]],"d":[["AdmDashboard","Dashboard admin","Admin dashboard"],["AdmBengkel","Kontrol order Bengkel Siaga","Bengkel Siaga order control"]]},"kawan-ojol":{"x":[["Main","Beranda","Home",844],["Akun","Akun dan KTA","Account and member card",844],["Merchant","Merchant","Merchants",844],["Cashback","Cashback","Cashback",844],["Bantuan","Live chat dan SOS","Live chat and SOS",844],["SosPilih","Pilih jenis darurat","Choose emergency",844]],"d":[["AdminDashboard","Dashboard master","Master dashboard"],["AdminAnggota","Anggota dan KTA","Members and cards"]]}};
+SL.hikrona={"x":[["m-Login","Login per peran","Role-based login",844],["m-S-Home","Beranda","Home",844],["m-S-Absen","Scan gate","Gate scan",844],["m-S-Tugas","E-learning","E-learning",844],["m-S-Rapor","E-Rapor","E-Report",844],["m-W-Home","Beranda","Home",844],["m-W-Bayar","Pembayaran","Payments",844],["m-G-Home","Beranda","Home",844]],"d":[["Main","Beranda dashboard","Dashboard home"],["Absensi","Absensi sekolah","School attendance"]]};
+var POV={"jolafy":{"l":["Kami mendengar satu keinginan: rental di Bali yang modern, dengan kebebasan pergi ke mana saja dan layanan terbaik. Vendor lokal juga butuh cara yang lebih rapi untuk mengelola order dan unit.","We heard one wish: a modern rental business in Bali, with the freedom to go anywhere and the best service. Local vendors also needed a tidier way to manage orders and units."],"s":["Kami menyatukan skuter, mobil, dan perlengkapan liburan dalam satu pesanan, lalu menghubungkan pelanggan, vendor, dan tim admin.","We brought scooters, cars and holiday gear into one booking, then connected customers, vendors and the admin team."],"b":["Identitas Jolafy, Kro Club, dan Jolafy Bible","The Jolafy identity, Kro Club and Jolafy Bible"],"a":["Aplikasi pelanggan dan Jolafy Mitra","Customer app and Jolafy Partner"],"y":["Dashboard admin untuk transaksi, verifikasi, keuangan, dan komisi","Admin dashboard for transactions, verification, finance and commission"]},"hikrona":{"l":["Kami mendengar guru dan staf kehabisan waktu untuk administrasi: absensi kertas, informasi yang tercecer, dan rapor yang disusun ulang setiap semester.","We heard teachers and staff running out of time on admin: paper registers, scattered information and report cards rebuilt every semester."],"s":["Kami menyatukan seluruh kegiatan sekolah dalam satu platform dengan dua pintu masuk, sehingga data di satu fitur langsung terpakai di fitur lain.","We brought every school activity into one platform with two ways in, so data entered in one feature is ready in the next."],"b":["Identitas Hikrona dan hikrona.com","The Hikrona identity and hikrona.com"],"a":["Aplikasi mobile untuk siswa, wali, dan guru","Mobile app for students, parents and teachers"],"y":["Dashboard web dengan 18 fitur yang terhubung","Web dashboard with 18 connected features"]},"otoroads":{"l":["Kami mendengar pemilik kendaraan di Bali harus antre di bengkel, ragu saat jual beli bekas, dan berpindah tempat untuk urusan dealer, leasing, dan Samsat.","We heard vehicle owners in Bali queueing at workshops, unsure about used sales, and moving between dealers, leasing offices and Samsat."],"s":["Kami menyatukan servis, jual beli, kredit, dan Samsat dalam satu aplikasi, dengan mekanik yang datang ke lokasi pelanggan.","We brought servicing, sales, credit and Samsat into one app, with mechanics who come to the customer."],"b":["Identitas Otoroads dan Bengkel Siaga","The Otoroads identity and Bengkel Siaga"],"a":["Aplikasi customer untuk servis, showroom, dan jual kendaraan","Customer app for service, showroom and selling"],"y":["Dashboard admin dan portal kreditur","Admin dashboard and lender portal"]},"kawan-ojol":{"l":["Kami mendengar kebutuhan pengemudi ojol yang bekerja di jalan setiap hari: perlindungan, tabungan untuk masa depan, pengeluaran yang lebih hemat, dan bantuan cepat saat darurat.","We heard what ojol drivers on the road every day need: protection, savings for the future, lower daily costs and fast help in an emergency."],"s":["Kami merancang satu keanggotaan yang menyatukan semuanya, dari kartu anggota sampai tombol SOS yang mengabari kawan terdekat dan korwil.","We designed one membership that holds it all, from the member card to an SOS button that alerts nearby drivers and coordinators."],"b":["Identitas Kawan Ojol dan kartu anggota","The Kawan Ojol identity and member card"],"a":["Aplikasi anggota dengan layanan dan SOS","Member app with services and SOS"],"y":["Panel admin untuk anggota, verifikasi, merchant, dan bantuan","Admin panel for members, verification, merchants and help"]},"trihita":{"l":["Kami mendengar kebutuhan desa adat di Bali akan layanan ride-hailing yang dijalankan lewat BUPDA, dan petani serta warga yang ingin menjual langsung ke hotel dan restoran.","We heard Bali’s desa adat villages wanting a ride-hailing service run through BUPDA, and farmers and villagers wanting to sell directly to hotels and restaurants."],"s":["Kami menjadikan BUPDA sebagai operator, lalu membangun Hita Bike, Hita Car, dan Hita Mart dalam satu ekosistem Trihita.","We made BUPDA the operator, then built Hita Bike, Hita Car and Hita Mart into one Trihita ecosystem."],"b":["Identitas Trihita dan keluarga merek Hita","The Trihita identity and the Hita brand family"],"a":["Aplikasi penumpang dan aplikasi mitra pengemudi","Passenger app and driver partner app"],"y":["Sistem pesanan, dompet, dan pendapatan mitra","Booking, wallet and partner earnings system"]}};
+function pov(p,i){var v=POV[p.id];var row=function(a,b){return '<div><dt>'+a+'</dt><dd>'+b[i]+'</dd></div>'};
+  return '<section class="band b-mist"><div class="wrap"><div class="stack"><p class="eyebrow">'+(i?'How we worked on ':'Cara kami mengerjakan ')+p.n+'</p><h2 class="h2 pj-h">'+(i?'We listen, find the solution, then deliver it.':'Kami mendengar, mencari solusi, lalu mewujudkannya.')+'</h2></div><ol class="pov"><li><h3>'+(i?'What we heard':'Yang kami dengar')+'</h3><p>'+v.l[i]+'</p></li><li><h3>'+(i?'The solution we found':'Solusi yang kami cari')+'</h3><p>'+v.s[i]+'</p></li><li><h3>'+(i?'What we delivered':'Yang kami deliver')+'</h3><dl>'+row('Branding',v.b)+row(i?'App':'Aplikasi',v.a)+row(i?'System':'Sistem',v.y)+'</dl></li></ol></div></section>';
+}
+function slider(p,i){var S=SL[p.id];
+  var one=function(r){return '<button type="button" class="scr" data-scr="'+p.id+'/'+r[0]+'" data-cap="'+r[1+i]+'"><span class="scr-f"><img src="img/app/'+p.id+'/'+r[0]+'.webp" alt="'+r[1+i]+'" width="390" height="844" loading="lazy"></span><span class="scr-c">'+r[1+i]+'</span></button>'};
+  var dash=function(r){return '<button type="button" class="scr dash" data-wide="1" data-scr="'+p.id+'/dash-'+r[0]+'" data-cap="'+r[1+i]+'"><span class="dash-f"><i></i><img src="img/app/'+p.id+'/dash-'+r[0]+'.webp" alt="'+r[1+i]+'" width="1440" height="960" loading="lazy"></span><span class="scr-c">'+r[1+i]+'</span></button>'};
+  return '<section class="band b-paper"><div class="wrap"><div class="sl-head"><div class="stack"><p class="eyebrow">'+(i?'App and dashboard':'Aplikasi dan dashboard')+'</p><h2 class="h2 pj-h">'+(i?'A look inside.':'Tampilan di dalamnya.')+'</h2><p class="lead">'+(i?'Swipe through the app and tap a screen to see it in full. The names and figures are examples.':'Geser untuk melihat aplikasi, lalu ketuk layar untuk melihatnya utuh. Nama dan angka di dalamnya adalah contoh.')+'</p></div><div class="sl-nav"><button type="button" class="sl-b" data-d="-1" aria-label="'+(i?'Previous screens':'Layar sebelumnya')+'">←</button><button type="button" class="sl-b" data-d="1" aria-label="'+(i?'Next screens':'Layar berikutnya')+'">→</button></div></div><div class="sl-rail" tabindex="0" aria-label="'+(i?'App screens':'Layar aplikasi')+'">'+S.x.map(one).join('')+'</div><div class="dash-g">'+S.d.map(dash).join('')+'</div></div></section>';
+}
+function gallery(p,i){
+  if(SL[p.id])return slider(p,i);
+  var G=APP[p.id];if(!G)return '';var pro=p.id==='trihita';
+  var n=G.reduce(function(a,g){return a+g[1].length},0);
+  return '<section class="band b-paper"><div class="wrap"><div class="stack"><p class="eyebrow">'+n+(i?' screens':' layar')+'</p><h2 class="h2 pj-h">'+(i?'Every screen in the app.':'Semua layar aplikasi.')+'</h2><p class="lead">'+(pro?(i?'Tap a screen to see it in full.':'Ketuk layar untuk melihatnya utuh.'):(i?'Tap a screen to see it in full. The names and figures are examples.':'Ketuk layar untuk melihatnya utuh. Nama dan angka di dalamnya adalah contoh.'))+'</p></div>'+G.map(function(g){return '<div class="scr-group"><h3>'+g[0][i]+'<span>'+g[1].length+'</span></h3><div class="scr-grid'+(pro?' pro':'')+'">'+g[1].map(function(r){return '<button type="button" class="scr" data-scr="'+p.id+'/'+r[0]+'" data-h="'+r[3]+'" data-cap="'+r[1+i]+'"><span class="scr-f"><img src="img/app/'+p.id+'/'+r[0]+'.webp" alt="'+r[1+i]+'" width="390" height="'+r[3]+'" loading="lazy"></span><span class="scr-c">'+r[1+i]+'</span></button>'}).join('')+'</div></div>'}).join('')+'</div></section>';
+}
+function grid(x,i){return '<ul class="pj-grid n'+x.length+'">'+x.map(function(r){return '<li><h3>'+r[0][i]+'</h3><p>'+r[1][i]+'</p></li>'}).join('')+'</ul>'}
+var PICK={"jolafy": ["Main", "Scooter", "Club"], "hikrona": ["m-S-Home", "m-S-Absen", "m-W-Bayar"], "otoroads": ["Main", "CallMechanic", "UsedShowroom"], "kawan-ojol": ["Main", "Bantuan", "Cashback"], "trihita": ["passenger-drivers", "passenger-promo", "driver-account"]},ROW=[["jolafy/Main", "hikrona/m-S-Home", "otoroads/Main", "kawan-ojol/Main", "jolafy/Booking", "hikrona/m-S-Rapor", "otoroads/CallMechanic", "kawan-ojol/Merchant", "jolafy/Bible"], ["otoroads/UsedShowroom", "kawan-ojol/Bantuan", "jolafy/Club", "hikrona/m-W-Bayar", "otoroads/Account", "kawan-ojol/Cashback", "jolafy/VendorHome", "hikrona/m-G-Home", "otoroads/Activity"]];
+function renderProjectPage(){
+  var i=lang==='en'?1:0,m=document.querySelector('main[data-view="project"]');
+  var ph=function(f){var id=f.split('/')[0];return '<a class="mq-p" href="#'+id+'" tabindex="-1" aria-hidden="true"><img src="img/app/'+f+'.webp" alt="" width="390" height="844" loading="lazy"></a>'};
+  var track=function(r){var a=r.map(ph).join('');return '<div class="mq-t"><div>'+a+'</div><div aria-hidden="true">'+a+'</div></div>'};
+  m.innerHTML='<section class="pr-hero"><div class="wrap stack"><p class="eyebrow">'+P.length+' project</p><h1>Project.</h1><p class="lead">'+(i?'From schools to desa adat villages. Every project starts by listening to the problem, then we deliver it as branding, apps and systems.':'Dari sekolah sampai desa adat. Setiap project dimulai dari mendengar masalah, lalu kami wujudkan dalam branding, aplikasi, dan sistem.')+'</p></div><div class="mq" style="--d:70s" aria-hidden="true">'+track(ROW[0])+'</div><div class="mq rev" style="--d:85s" aria-hidden="true">'+track(ROW[1])+'</div></section><section class="pr-list"><div class="wrap">'+P.map(function(p,n){return '<article class="pr" style="--c:'+p.c+';--n:'+n+'"><div class="pr-t">'+(p.lg?'<img class="pj-logo '+(p.lc||'')+'" src="img/'+p.lg+'.png" alt="">':'')+'<p class="eyebrow">'+p.t[i].replace('&','&amp;')+'</p><h2>'+p.n+'</h2><p>'+p.d[i]+'</p><a class="btn btn-w" href="#'+p.id+'">'+(i?'View project':'Lihat project')+' →</a></div><div class="pr-ph'+(p.id==='trihita'?' pro':'')+'" aria-hidden="true">'+PICK[p.id].map(function(f,k){return '<img src="img/app/'+p.id+'/'+f+'.webp" alt="" loading="lazy" style="--k:'+k+'">'}).join('')+'</div></article>'}).join('')+'</div></section>';
+}
+function renderProjects(){
+  renderProjectPage();
+  var i=lang==='en'?1:0,LB=lang==='en'?{pf:'Project',visit:'Visit ',next:'Next project',all:'All projects',talk:'Want something like this for your business?',wa:'Chat on WhatsApp'}:{pf:'Project',visit:'Kunjungi ',next:'Project berikutnya',all:'Semua project',talk:'Ingin sistem seperti ini untuk usaha Anda?',wa:'Chat di WhatsApp'};
+  P.forEach(function(p,n){
+    var m=document.querySelector('main[data-view="'+p.id+'"]'),nx=P[(n+1)%P.length],h='';
+    h+='<section class="open-split pj-open"><div>'+(p.lg?'<img class="pj-logo '+(p.lc||'')+'" src="img/'+p.lg+'.png" alt="">':'')+'<p class="eyebrow" style="color:#fff"><a href="#project">'+LB.pf+'</a> · '+p.n+'</p><h1>'+p.h[i]+'</h1><p>'+p.l[i]+'</p>'+(p.site?'<a class="btn btn-w" href="'+p.site+'" target="_blank" rel="noopener" style="justify-self:start">'+LB.visit+p.site.replace('https://','')+'</a>':'')+'</div><span class="pj-media"><img src="img/'+p.hero+'.webp" alt="'+p.a[i]+'" style="object-position:'+p.hpos+'"></span></section>';
+    h+=pov(p,i);
+    if(p.p)h+='<section class="band b-paper"><div class="wrap"><h2 class="h2 pj-h">'+p.p.h[i]+'</h2>'+grid(p.p.x,i)+'</div></section>';
+    h+='<section class="band '+(p.p?'b-mist':'b-paper')+'"><div class="wrap"><h2 class="h2 pj-h">'+p.s.h[i]+'</h2>'+grid(p.s.x,i)+'</div></section>';
+    if(p.f)h+='<section class="band b-ink"><div class="wrap"><h2 class="h2 pj-h">'+p.f.h[i]+'</h2>'+(p.f.chips?'<ul class="pj-chips">'+p.f.chips.map(function(c){return '<li>'+c[i]+'</li>'}).join('')+'</ul>':grid(p.f.x,i))+'</div></section>';
+    h+=gallery(p,i);
+    h+='<section class="band pj-spot"><div class="wrap'+(p.o.img?' spot-img':'')+'"><div class="stack"><p class="eyebrow">'+p.o.e[i]+'</p><h2 class="h2 pj-h">'+p.o.h[i]+'</h2><p class="lead">'+p.o.l[i]+'</p></div>'+(p.o.img?'<img src="img/'+p.o.img+'.webp" alt="'+p.o.imga[i]+'" loading="lazy">':'')+(p.o.x.length?'<ol class="pj-grid n'+p.o.x.length+(p.o.steps?' seq':'')+'">'+p.o.x.map(function(r){return '<li><h3>'+r[0][i]+'</h3><p>'+r[1][i]+'</p></li>'}).join('')+'</ol>':'')+'</div></section>';
+    h+='<section class="band b-paper"><div class="wrap pj-next"><a href="#'+nx.id+'"><span class="eyebrow">'+LB.next+'</span><b>'+nx.n+' →</b></a><div class="stack"><p class="lead">'+LB.talk+'</p><div class="cta-row"><a class="btn btn-k" href="https://wa.me/6281808001811" target="_blank" rel="noopener">'+LB.wa+'</a></div></div></div></section>';
+    m.innerHTML=h;
+  });
+}
+function renderPortfolio(){
+  var i=lang==='en'?1:0;
+  $$('[data-portfolio]').forEach(function(el){
+    el.innerHTML=P.map(function(p){return '<a class="card rise in" href="#'+p.id+'"><img src="img/'+p.img+'.webp" alt="'+p.a[i]+'" style="object-position:'+p.pos+'" loading="lazy"><div><p class="eyebrow">'+p.t[i].replace('&','&amp;')+'</p><h3>'+p.n+'</h3><p>'+p.d[i]+'</p></div></a>'}).join('');
+  });
+  $$('[data-names]').forEach(function(el){
+    el.innerHTML=P.map(function(p){return '<li><a href="#'+p.id+'"><b>'+p.n+'</b><span>'+p.t[i].replace('&','&amp;')+'</span></a></li>'}).join('');
+  });
+  renderProjects();
+}
+
+P.forEach(function(p){var m=document.createElement('main');m.dataset.view=p.id;m.dataset.project='';m.hidden=true;m.style.setProperty('--p',p.c);document.querySelector('footer').before(m)});
+
+/* Language */
+$$('[data-en]').forEach(function(e){e.dataset.id=e.innerHTML});
+$$('[data-en-alt]').forEach(function(e){e.dataset.idAlt=e.alt});
+$$('[data-en-aria]').forEach(function(e){e.dataset.idAria=e.getAttribute('aria-label')});
+function splitWords(){
+  $$('.say').forEach(function(s){
+    s.innerHTML=s.textContent.trim().split(/\s+/).map(function(w){return '<span class="w">'+w+'</span> '}).join('');
+  });
+}
+function setLang(l){
+  lang=l;root.lang=l;store.set('sk-lang',l);
+  $$('[data-en]').forEach(function(e){e.innerHTML=l==='en'?e.dataset.en:e.dataset.id});
+  $$('[data-en-alt]').forEach(function(e){e.alt=l==='en'?e.dataset.enAlt:e.dataset.idAlt});
+  $$('[data-en-aria]').forEach(function(e){e.setAttribute('aria-label',l==='en'?e.dataset.enAria:e.dataset.idAria)});
+  $$('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===l))});
+  renderPortfolio();splitWords();renderDemo();onScroll();if(window.__ofl)window.__ofl();
+}
+
+/* Routing between the four pages */
+var views=['home','thinker','tech','project','security','about'].concat(P.map(function(p){return p.id})),current='';
+function show(v,anchor){
+  if(views.indexOf(v)<0)v='home';
+  var changed=v!==current;current=v;
+  $$('main[data-view]').forEach(function(m){m.hidden=m.dataset.view!==v});
+  $$('#links a').forEach(function(a){a.href.slice(a.href.indexOf('#')+1)===(P.some(function(p){return p.id===v})?'project':v)?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
+  closeMenu();if(!lb.hidden)lbClose();
+  if(anchor){var t=document.getElementById(anchor);if(t){t.scrollIntoView();return onScroll()}}
+  if(changed)window.scrollTo(0,0);
+  syncView();onScroll();if(window.__ofl&&office)office.sync();
+}
+function route(){var h=location.hash.slice(1);if(h==='demo')show('home','demo');else show(h)}
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
+  e.preventDefault();var h=a.getAttribute('href').slice(1);
+  if(location.hash==='#'+h){route();window.scrollTo(0,h==='demo'?window.scrollY:0)}else location.hash=h;
+});
+window.addEventListener('hashchange',route);
+
+/* Menu */
+var nav=$('#nav'),menu=$('#menu');
+function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expanded','false')}
+menu.addEventListener('click',function(){var o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(o))});
+$$('.lang button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.lang)})});
+
+/* Scroll: opening push-in, nav state, lit statement */
+var stage=$('#stage'),sImg=$('#stage-img'),sCopy=$('#stage-copy'),sFade=$('#stage-fade'),tick=false;
+function onScroll(){
+  if(tick)return;tick=true;
+  requestAnimationFrame(function(){
+    tick=false;
+    var y=window.scrollY,vh=window.innerHeight;
+    nav.classList.toggle('solid',y>30);
+    if(current==='home'&&!calm){
+      var run=Math.max(1,stage.offsetHeight-vh),p=Math.min(1,y/run);
+      sImg.style.transform='scale('+(1+p*.26)+')';
+      sCopy.style.transform='translateY('+(-p*70)+'px)';
+      sCopy.style.opacity=String(Math.max(0,1-p*1.5));
+      sFade.style.opacity=String(Math.max(0,(p-.55)/.45));
+    }
+    $$('main:not([hidden]) .say').forEach(function(s){
+      var r=s.getBoundingClientRect(),ws=s.children,q=calm?1:Math.min(1,Math.max(0,(vh*.82-r.top)/(r.height+vh*.28))),n=Math.ceil(q*ws.length);
+      for(var i=0;i<ws.length;i++)ws[i].classList.toggle('on',i<n);
+    });
+  });
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+
+/* Rise on enter (position only, so everything stays readable) */
+if('IntersectionObserver' in window&&!calm){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -6% 0px'});
+  $$('.rise').forEach(function(e){io.observe(e)});
+}else $$('.rise').forEach(function(e){e.classList.add('in')});
+
+/* Fraud monitor simulation: all data below is invented example data */
+var EV=[
+ {w:['Penjualan QRIS','QRIS sale'],o:'Seminyak · Kasir 02',a:184000,r:4},
+ {w:['Penjualan tunai','Cash sale'],o:'Ubud · Kasir 01',a:96000,r:6},
+ {w:['Void setelah struk tercetak','Void after receipt printed'],o:'Canggu · Kasir 04',a:1250000,r:94,why:[['Void ke-6 dari kasir ini malam ini','6th void from this cashier tonight'],['Terjadi 3 menit sebelum tutup kasir','Happened 3 minutes before register close'],['Tidak ada uang kembali yang tercatat','No cash return recorded']],act:['Tahan tutup kasir dan kirim ke manajer outlet','Hold register close and send to outlet manager']},
+ {w:['Stok masuk','Stock received'],o:'Gudang Denpasar',a:7400000,r:9},
+ {w:['Penjualan kartu','Card sale'],o:'Seminyak · Kasir 03',a:512000,r:5},
+ {w:['Refund tanpa transaksi asal','Refund with no original sale'],o:'Ubud · Kasir 02',a:640000,r:88,why:[['Nomor struk tidak ditemukan','Receipt number not found'],['Refund ke rekening yang baru dipakai sekali','Refund to an account used only once before'],['Tidak ada persetujuan supervisor','No supervisor approval']],act:['Tahan refund sampai supervisor menyetujui','Hold refund until a supervisor approves']},
+ {w:['Penjualan QRIS','QRIS sale'],o:'Canggu · Kasir 01',a:238000,r:3},
+ {w:['Refund dengan struk asli','Refund with original receipt'],o:'Seminyak · Kasir 02',a:145000,r:18},
+ {w:['Diskon 40% di luar wewenang','40% discount above authority'],o:'Seminyak · Kasir 03',a:2100000,r:81,why:[['Batas diskon kasir ini 10%','This cashier’s discount limit is 10%'],['Pelanggan yang sama menerima diskon tiga kali','Same customer discounted three times'],['Kode diskon dimasukkan manual','Discount code typed in by hand']],act:['Minta otorisasi manajer sebelum transaksi selesai','Require manager authorisation before completing']},
+ {w:['Penjualan tunai','Cash sale'],o:'Ubud · Kasir 03',a:73000,r:7},
+ {w:['Stok keluar tanpa penjualan','Stock out with no sale'],o:'Gudang Denpasar',a:3600000,r:86,why:[['12 unit keluar tanpa pesanan terkait','12 units left with no linked order'],['Dicatat di luar jam operasional gudang','Logged outside warehouse hours'],['Akun yang sama mengubah catatan stok','Same account edited the stock record']],act:['Kunci penyesuaian stok dan minta opname','Lock stock adjustments and request a count']},
+ {w:['Bayar vendor terjadwal','Scheduled vendor payment'],o:'Keuangan',a:4250000,r:12},
+ {w:['Rekening vendor diganti sebelum bayar','Vendor bank details changed before payment'],o:'Keuangan',a:18500000,r:97,why:[['Rekening diubah 40 menit sebelum pembayaran','Account changed 40 minutes before payment'],['Nama pemilik rekening berbeda dari vendor','Account holder differs from the vendor'],['Nominal 3 kali rata-rata vendor ini','Amount is 3 times this vendor’s average']],act:['Tahan pembayaran dan verifikasi ke vendor','Hold payment and verify with the vendor']}
+];
+var SAFE=[['Sesuai pola biasa untuk outlet dan jam ini','Matches the usual pattern for this outlet and hour'],['Pembayaran dan stok cocok','Payment and stock agree']];
+var ROWS=8,feed=$('#feed'),detail=$('#detail'),rows=[],seq=0,clock=21*60+12,chosen=null,userPick=false,running=!calm,stN=1284,stF=0,stV=0;
+function fmt(n){return n.toLocaleString('id-ID')}
+function rp(n){return 'Rp '+fmt(n)}
+function push(){
+  var e=EV[seq%EV.length];seq++;clock+=2+(seq*7%6);
+  var r={id:seq,e:e,time:('0'+Math.floor(clock/60)%24).slice(-2)+':'+('0'+clock%60).slice(-2)};
+  rows.unshift(r);if(rows.length>ROWS)rows.pop();
+  stN+=1+(seq*13%5);
+  if(e.r>=70){stF++;stV+=e.a;if(!userPick)chosen=r}
+  return r;
+}
+function renderDetail(){
+  var r=chosen||rows[0];if(!r)return;var e=r.e,i=lang==='en'?1:0,hot=e.r>=70;
+  detail.className=hot?'':'safe';
+  detail.innerHTML='<p class="meta">'+r.time+' · '+e.o.replace('Kasir',T('Kasir','Cashier')).replace('Gudang Denpasar',T('Gudang Denpasar','Denpasar warehouse')).replace('Keuangan',T('Keuangan','Finance'))+' · '+rp(e.a)+'</p><h3>'+e.w[i]+'</h3><p class="meta">'+T('Skor risiko','Risk score')+' '+e.r+'/100</p><ul>'+(e.why||SAFE).map(function(x){return '<li>'+x[i]+'</li>'}).join('')+'</ul>'+(hot?'<p class="act"><b>'+T('TINDAKAN OTOMATIS','AUTOMATIC ACTION')+'</b>'+e.act[i]+'</p>':'');
+}
+function renderDemo(fresh){
+  var i=lang==='en'?1:0;
+  feed.innerHTML=rows.map(function(r,n){var e=r.e,hot=e.r>=70;
+    return '<button type="button" class="ev'+(fresh&&n===0?' new':'')+'" data-id="'+r.id+'" aria-pressed="'+(chosen&&chosen.id===r.id)+'"><time>'+r.time+'</time><span class="what"><span>'+e.w[i]+'</span><small>'+e.o.replace('Kasir',T('Kasir','Cashier')).replace('Gudang Denpasar',T('Gudang Denpasar','Denpasar warehouse')).replace('Keuangan',T('Keuangan','Finance'))+'</small></span><span class="amt">'+rp(e.a)+'</span><span class="risk'+(hot?' hot':'')+'">'+e.r+'</span></button>'
+  }).join('');
+  $('#st-n').textContent=fmt(stN);$('#st-f').textContent=fmt(stF);$('#st-v').textContent=rp(stV);
+  var s=$('#demo-state');s.textContent=running?T('Memantau','Monitoring'):T('Dijeda','Paused');s.classList.toggle('paused',!running);
+  $('#demo-toggle').textContent=running?T('Jeda','Pause'):T('Lanjutkan','Resume');
+  renderDetail();
+}
+feed.addEventListener('click',function(e){
+  var b=e.target.closest('.ev');if(!b)return;
+  var id=+b.dataset.id;rows.forEach(function(r){if(r.id===id)chosen=r});
+  userPick=true;renderDemo();
+});
+$('#demo-toggle').addEventListener('click',function(){running=!running;userPick=false;renderDemo()});
+for(var k=0;k<ROWS;k++)push();
+var demoSeen=false;
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){demoSeen=es[0].isIntersecting}).observe($('#monitor'));
+setInterval(function(){if(running&&demoSeen&&current==='home'&&!document.hidden){push();renderDemo(true)}},2600);
+
+/* Synchronising field: Kuramoto oscillators, the maths of fireflies falling into step */
+var cv=$('#sync'),cx=cv.getContext('2d'),dots=[],W=0,H=0,dpr=1,gap=24,K=0,t0=0,raf=0,syncOut=$('#sync-r'),TAU=Math.PI*2;
+function sizeSync(){
+  var b=cv.getBoundingClientRect();if(!b.width)return;
+  dpr=Math.min(2,window.devicePixelRatio||1);W=b.width;H=b.height;cv.width=W*dpr;cv.height=H*dpr;
+  gap=W<620?20:26;dots=[];
+  for(var y=gap/2;y<H;y+=gap)for(var x=gap/2;x<W;x+=gap)dots.push({x:x,y:y,o:(x+y*.6)/Math.max(W,1)*TAU*1.6,w:.024+(Math.random()-.5)*.018,p:Math.random()*TAU});
+  t0=0;K=0;
+}
+function stepSync(){
+  var sx=0,sy=0,n=dots.length,i,d,a;
+  for(i=0;i<n;i++){d=dots[i];a=d.p+d.o;sx+=Math.cos(a);sy+=Math.sin(a)}
+  var R=Math.sqrt(sx*sx+sy*sy)/n,psi=Math.atan2(sy,sx);
+  for(i=0;i<n;i++){d=dots[i];d.p+=d.w+K*R*Math.sin(psi-(d.p+d.o))}
+  syncOut.textContent=Math.round(R*100)+'%';
+}
+function drawSync(){
+  cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,H);
+  for(var i=0;i<dots.length;i++){var d=dots[i],b=.5+.5*Math.sin(d.p);b=b*b;
+    cx.fillStyle='rgba(255,255,255,'+(.1+b*.85).toFixed(3)+')';
+    cx.beginPath();cx.arc(d.x,d.y,1.3+b*2.5,0,TAU);cx.fill()}
+}
+function loopSync(){
+  t0++;K=Math.min(.09,Math.max(0,(t0-70)/380*.09));
+  stepSync();drawSync();
+  raf=current==='tech'&&!document.hidden?requestAnimationFrame(loopSync):0;
+}
+function syncView(){
+  if(current!=='tech')return;
+  if(!dots.length)sizeSync();
+  if(calm){dots.forEach(function(d){d.p=-d.o});K=0;stepSync();drawSync();return}
+  drawSync();if(!raf)raf=requestAnimationFrame(loopSync);
+}
+$('#sync-reset').addEventListener('click',function(){dots.forEach(function(d){d.p=Math.random()*TAU});t0=0;K=0;syncView()});
+window.addEventListener('resize',function(){if(current==='tech'){sizeSync();syncView()}else dots=[]});
+document.addEventListener('visibilitychange',syncView);
+
+
+/* Screen viewer */
+var lb=$('#lb'),lbList=[],lbAt=0,lbFrom=null;
+function lbShow(n){lbAt=(n+lbList.length)%lbList.length;var b=lbList[lbAt],im=$('#lb-img');im.src='img/app/'+b.dataset.scr+'.webp';im.alt=b.dataset.cap;$('#lb-c').textContent=b.dataset.cap;lb.classList.toggle('wide',!!b.dataset.wide);$('#lb-i').textContent=(lbAt+1)+' / '+lbList.length;$('#lb-s').scrollTop=0}
+function lbClose(){lb.hidden=true;document.documentElement.style.overflow='';if(lbFrom)lbFrom.focus()}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.scr');if(!b)return;lbFrom=b;lbList=$$('.scr',b.closest('main'));lbShow(lbList.indexOf(b));lb.hidden=false;document.documentElement.style.overflow='hidden';$('#lb-x').focus()});
+$('#lb-x').addEventListener('click',lbClose);$('#lb-p').addEventListener('click',function(){lbShow(lbAt-1)});$('#lb-n').addEventListener('click',function(){lbShow(lbAt+1)});
+lb.addEventListener('click',function(e){if(e.target===lb)lbClose()});
+document.addEventListener('keydown',function(e){if(lb.hidden)return;if(e.key==='Escape')lbClose();if(e.key==='ArrowLeft')lbShow(lbAt-1);if(e.key==='ArrowRight')lbShow(lbAt+1)});
+
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.sl-b');if(!b)return;var r=b.closest('section').querySelector('.sl-rail');r.scrollBy({left:r.clientWidth*.8*(+b.dataset.d),behavior:calm?'auto':'smooth'})});
+
+/* Security log: example rows, moved by CSS */
+(function(){var L=[['SQL injection',"/login?id=1' OR '1'='1",'203.0.113.24'],['XSS','/search?q=<script>','203.0.113.87'],['Path traversal','/files?name=../../etc/passwd','198.51.100.12'],['Log4Shell','User-Agent: ${jndi:ldap://...}','198.51.100.45'],['Scanner: sqlmap','User-Agent: sqlmap','203.0.113.9'],['Probe .env','/.env','192.0.2.61'],['SSRF','/fetch?url=http://169.254.169.254/','192.0.2.33'],['Command injection','/ping?host=;cat /etc/passwd','198.51.100.70']];
+var e=function(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};
+var h=L.map(function(r){return '<div class="sec-r"><b>'+e(r[0])+'</b><i>BLOCK</i><span>'+r[2]+' · '+e(r[1])+'</span></div>'}).join('');$('#sec-t').innerHTML=h+h})();
+
+/* Office simulation: a small hand-built WebGL scene of box characters. Nothing here is a real business record. */
+var office=(function(){
+var st=$('#of-stage'),cv=$('#of-cv'),gl=null;try{gl=cv.getContext('webgl',{antialias:true,alpha:true,stencil:true,preserveDrawingBuffer:true})}catch(e){}
+if(!gl)return {lang:function(){},sync:function(){}};
+var hex=function(h){return [parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255]};
+var C={};'floor #f4f2ec,path #e7e5de,wall #fbfaf6,trim #cfd6e6,desk #e9c79b,deskd #c99a66,steel #8f9bb3,dark #2c3347,screen #16213e,sky #bfe0ff,plant #38b26b,pot #e8784a,box #d9a860,box2 #e7c07e,rug1 #bdeed6,rug2 #ffd8bf,rug3 #d9dfea,rug4 #dcd3ff,rug5 #c6dcff,rug6 #fff0b8,blue #2d6bff,mint #27c28a,red #ff4b3e,amber #ffb627,violet #8e5cff,white #ffffff,pants #39435e,pants2 #5a4a3f'.split(',').forEach(function(s){var a=s.split(' ');C[a[0]]=hex(a[1])});
+var SK=['#ffd7a8','#e8b184','#b97a50','#8a5a3a','#f2c291'].map(hex),HAIR=['#2b2320','#55392a','#111418','#7a4a22'].map(hex);
+var I=[1,0,0,0,0,1,0,0,0,0,1,0];
+function mul(a,b){var r=[];for(var i=0;i<3;i++){for(var j=0;j<3;j++)r.push(a[i*4]*b[j]+a[i*4+1]*b[4+j]+a[i*4+2]*b[8+j]);r.push(a[i*4]*b[3]+a[i*4+1]*b[7]+a[i*4+2]*b[11]+a[i*4+3])}return r}
+function tr(x,y,z){return [1,0,0,x,0,1,0,y,0,0,1,z]}
+function ry(t){var c=Math.cos(t),s=Math.sin(t);return [c,0,s,0,0,1,0,0,-s,0,c,0]}
+function rx(t){var c=Math.cos(t),s=Math.sin(t);return [1,0,0,0,0,c,-s,0,0,s,c,0]}
+var F=[[0,1,0,[[-1,1,-1],[-1,1,1],[1,1,1],[1,1,-1]]],[0,-1,0,[[-1,-1,1],[-1,-1,-1],[1,-1,-1],[1,-1,1]]],[1,0,0,[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1]]],[-1,0,0,[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]]],[0,0,1,[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]]],[0,0,-1,[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]]]];
+function box(o,m,cx,y,cz,sx,sy,sz,c,e){e=e||0;var hx=sx/2,hy=sy/2,hz=sz/2,cy=y+hy;
+  for(var f=0;f<6;f++){var q=F[f],nx=m[0]*q[0]+m[1]*q[1]+m[2]*q[2],ny=m[4]*q[0]+m[5]*q[1]+m[6]*q[2],nz=m[8]*q[0]+m[9]*q[1]+m[10]*q[2],P=[];
+    for(var k=0;k<4;k++){var v=q[3][k],a=cx+v[0]*hx,b=cy+v[1]*hy,d=cz+v[2]*hz;P.push([m[0]*a+m[1]*b+m[2]*d+m[3],m[4]*a+m[5]*b+m[6]*d+m[7],m[8]*a+m[9]*b+m[10]*d+m[11]])}
+    [0,1,2,0,2,3].forEach(function(i){var p=P[i];o.push(p[0],p[1],p[2],nx,ny,nz,c[0],c[1],c[2],e)})}}
+var RM={cs:[-8,5,'rug1'],sales:[0,5,'rug2'],wh:[8,5,'rug3'],fin:[-8,-5,'rug4'],ctrl:[0,-5,'rug5'],hr:[8,-5,'rug6']},ORDER=['cs','sales','wh','fin','hr','ctrl'],ACC={cs:C.mint,sales:C.amber,wh:C.steel,fin:C.violet,ctrl:C.blue,hr:C.amber};
+var fl=[],ca=[],np=[];
+box(fl,I,0,-.5,0,25.4,.5,20.2,C.path);box(fl,I,0,-1.2,0,25.8,.7,20.6,C.trim);
+Object.keys(RM).forEach(function(k){var r=RM[k];box(fl,I,r[0],-.5,r[1],7.4,.505,8,C[r[2]])});
+box(ca,I,0,0,-10.05,25.4,2.6,.3,C.wall);box(ca,I,-12.65,0,0,.3,2.6,20.4,C.wall);
+[-9,-5,5,9].forEach(function(x){box(ca,I,x,1.1,-9.88,2.2,1.1,.06,C.sky,1)});[-6,-3,3,6].forEach(function(z){box(ca,I,-12.48,1.1,z,.06,1.1,2.2,C.sky,1)});
+function part(x,z,sx,sz){box(ca,I,x,0,z,sx,.8,sz,C.wall);box(ca,I,x,.8,z,sx,.07,sz,C.trim)}
+[-4,4].forEach(function(x){part(x,5,.2,8);part(x,-5,.2,8)});
+[[-8,1],[0,1],[8,1],[-8,-1],[0,-1],[8,-1]].forEach(function(p){part(p[0]-2.5,p[1],2.4,.2);part(p[0]+2.5,p[1],2.4,.2)});
+function plant(x,z){box(ca,I,x,0,z,.5,.5,.5,C.pot);box(ca,I,x,.5,z,.7,.6,.7,C.plant);box(ca,I,x,1.1,z,.42,.4,.42,C.plant)}
+plant(-11.6,-9.1);plant(11.6,-9.1);plant(-11.6,8.9);plant(3.2,8.9);plant(-3.2,-1.7);
+function desk(x,z,a,s){var m=mul(tr(x,0,z),ry(a));box(ca,m,0,.78,0,1.7,.1,.8,C.desk);[[-.75,-.3],[.75,-.3],[-.75,.3],[.75,.3]].forEach(function(l){box(ca,m,l[0],0,l[1],.1,.78,.1,C.deskd)});box(ca,m,0,.88,-.26,.14,.1,.1,C.dark);box(ca,m,0,.98,-.28,.9,.55,.07,C.dark);box(ca,m,0,1.02,-.24,.8,.45,.02,s||C.sky,1);box(ca,m,0,.89,.1,.6,.03,.2,C.white);box(ca,m,0,0,.72,.5,.46,.5,C.dark)}
+var W=[];function worker(x,z,a,sh,sk,ha,ty){W.push({x:x,z:z,a:a,sh:sh,sk:SK[sk],ha:HAIR[ha],p:x*1.3+z,ty:ty||'type'})}
+[[-10.1,3.4,C.mint],[-8,3.4,C.blue],[-5.9,3.4,C.violet],[-10.1,7,C.amber],[-5.9,7,C.red]].forEach(function(d,i){desk(d[0],d[1],Math.PI,C.sky);worker(d[0],d[1]-.72,0,d[2],i%5,i%4)});
+box(ca,I,0,0,6.8,5.2,.95,.9,C.desk);box(ca,I,0,.95,6.8,5.3,.08,1,C.deskd);box(ca,I,-1.4,1.03,6.9,.5,.34,.08,C.dark);box(ca,I,1.4,1.03,6.9,.5,.34,.08,C.dark);worker(-1.4,7.75,Math.PI,C.red,1,0,'stand');worker(1.4,7.75,Math.PI,C.blue,2,2,'stand');
+[[5,4],[5,7],[11.2,4],[11.2,7]].forEach(function(s,n){[-1.05,1.05].forEach(function(o){[-.45,.45].forEach(function(q){box(ca,I,s[0]+q,0,s[1]+o,.1,2.4,.1,C.steel)})});[.5,1.2,1.9].forEach(function(y){box(ca,I,s[0],y,s[1],1.1,.08,2.3,C.dark);[-.7,0,.7].forEach(function(o,i){if((n+i+y*10)%3<2)box(ca,I,s[0]+.05,y+.08,s[1]+o,.75,.5,.55,(i+n)%2?C.box:C.box2)})})});
+[[-10.1,-7.2],[-8,-7.2],[-5.9,-7.2],[-10.1,-3.8],[-5.9,-3.8]].forEach(function(d,i){desk(d[0],d[1],Math.PI,C.mint);worker(d[0],d[1]-.72,0,[C.violet,C.dark,C.mint,C.blue,C.amber][i],(i+2)%5,(i+1)%4)});
+[[5.9,-7.2],[8,-7.2],[10.1,-7.2],[5.9,-3.8],[10.1,-3.8]].forEach(function(d,i){desk(d[0],d[1],Math.PI,C.amber);worker(d[0],d[1]-.72,0,[C.amber,C.red,C.blue,C.mint,C.violet][i],(i+3)%5,(i+2)%4)});
+box(ca,I,0,1,-9.72,6.2,1.9,.14,C.dark);box(ca,I,-2.2,0,-3.4,1.5,.8,.8,C.desk);box(ca,I,2.2,0,-3.4,1.5,.8,.8,C.desk);
+box(ca,I,0,0,-5.6,4.2,.74,1.5,C.deskd);box(ca,I,0,.74,-5.6,4.4,.08,1.7,C.desk);
+worker(-1.4,-4.5,Math.PI,C.dark,2,1,'stand');worker(1.4,-4.5,Math.PI,C.blue,0,0,'stand');
+var NODE={};Object.keys(RM).forEach(function(k){var r=RM[k];NODE[k]=[r[0],3.3,r[1]]});
+[-8,0,8].forEach(function(x){box(np,I,x,3.26,0,.09,.09,10,C.blue,1);box(ca,I,x,0,0,.12,3.3,.12,C.trim)});box(np,I,0,3.26,0,16,.09,.09,C.blue,1);
+Object.keys(NODE).forEach(function(k){var n=NODE[k];box(np,I,n[0],3.16,n[2],.34,.3,.34,C.blue,1)});
+function counts(a){return a.length/10}
+var all=new Float32Array(fl.concat(ca,np)),nF=counts(fl),nC=counts(ca),nN=counts(np);
+var vs='attribute vec3 p,n,c;attribute float e;uniform mat4 V;uniform float S;varying vec3 v;void main(){vec3 q=p;if(S>.5){q.x-=q.y*.5;q.z-=q.y*.34;q.y=.03;}gl_Position=V*vec4(q,1.);vec3 L=normalize(vec3(.42,.8,.46));float d=max(dot(n,L),0.);float h=.5+.5*n.y;vec3 l=c*(.5+.2*h+.46*d);v=mix(l,c,e);}';
+var fs='precision highp float;varying vec3 v;uniform float S;void main(){gl_FragColor=S>.5?vec4(.14,.17,.32,.24):vec4(v,1.);}';
+function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o}
+var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+var aP=gl.getAttribLocation(pr,'p'),aN=gl.getAttribLocation(pr,'n'),aC=gl.getAttribLocation(pr,'c'),aE=gl.getAttribLocation(pr,'e'),uV=gl.getUniformLocation(pr,'V'),uS=gl.getUniformLocation(pr,'S');
+var bS=gl.createBuffer(),bD=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bS);gl.bufferData(gl.ARRAY_BUFFER,all,gl.STATIC_DRAW);
+[aP,aN,aC,aE].forEach(function(a){gl.enableVertexAttribArray(a)});
+function bind(b){gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,40,0);gl.vertexAttribPointer(aN,3,gl.FLOAT,false,40,12);gl.vertexAttribPointer(aC,3,gl.FLOAT,false,40,24);gl.vertexAttribPointer(aE,1,gl.FLOAT,false,40,36)}
+gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
+var yaw=Math.PI/4,dragYaw=0,W_=1,H_=1,VM=null;
+function view(){var t=yaw+dragYaw,ph=.62,cy=Math.cos(ph),sy=Math.sin(ph),rxv=[Math.cos(t),0,-Math.sin(t)],fw=[-Math.sin(t)*cy,-sy,-Math.cos(t)*cy],up=[-Math.sin(t)*sy,cy,-Math.cos(t)*sy];
+  var asp=W_/H_,span=asp<1?18.5:Math.max(11.7,17.2/asp);var ax=span*asp*.0+1/(span*asp),ay=1/span,z=1/40,dy=-.42;
+  VM=[rxv[0]*ax,up[0]*ay,fw[0]*z,0, rxv[1]*ax,up[1]*ay,fw[1]*z,0, rxv[2]*ax,up[2]*ay,fw[2]*z,0, 0,dy*ay,0,1];
+  gl.uniformMatrix4fv(uV,false,new Float32Array(VM))}
+function proj(x,y,z){var m=VM;return [(m[0]*x+m[4]*y+m[8]*z+m[12]+1)/2*W_,(1-(m[1]*x+m[5]*y+m[9]*z+m[13]))/2*H_]}
+function size(){var r=st.getBoundingClientRect();if(!r.width)return;var d=Math.min(2,devicePixelRatio||1);W_=r.width;H_=r.height;cv.width=W_*d;cv.height=H_*d;gl.viewport(0,0,cv.width,cv.height)}
+var LB=$$('.of-l',st);
+function labels(){LB.forEach(function(l){var r=RM[l.dataset.r],p=proj(r[0],5.2,r[1]);l.style.transform='translate('+p[0].toFixed(1)+'px,'+p[1].toFixed(1)+'px) translate(-50%,-100%)'})}
+function figure(o,x,z,a,w,t,arm,walk,carry){var m=mul(tr(x,0,z),ry(a)),sw=walk?Math.sin(t*7)*.65:0,bob=walk?Math.abs(Math.sin(t*7))*.05:0;
+  var seat=w.ty==='type'?-.28:0,yb=(w.ty==='type'&&!walk?.22:.68)+bob;
+  [-.13,.13].forEach(function(s,i){var L=mul(m,mul(tr(s,yb,0),rx(i?sw:-sw)));box(o,L,0,-yb+seat*0-.0,0,.2,yb,.24,w.pants||C.pants)});
+  box(o,m,0,yb,0,.56,.68,.3,w.sh);
+  [-.38,.38].forEach(function(s,i){var ang=arm!=null?arm+(i?Math.sin(t*9+w.p)*.14:-Math.sin(t*9+w.p)*.14):(i?-sw:sw),A=mul(m,mul(tr(s,yb+.62,0),rx(ang)));box(o,A,0,-.6,0,.18,.6,.2,w.sh);box(o,A,0,-.72,0,.17,.14,.19,w.sk)});
+  box(o,m,0,yb+.68,0,.42,.42,.42,w.sk);box(o,m,0,yb+1.04,-.02,.46,.14,.46,w.ha);box(o,m,-.1,yb+.84,.215,.07,.07,.02,C.dark);box(o,m,.1,yb+.84,.215,.07,.07,.02,C.dark);
+  if(carry)box(o,m,0,yb+.34,.42,.56,.44,.5,C.box)}
+var ROUTE=[{sh:C.amber,sk:SK[1],ha:HAIR[0],p:1,ty:'w',box:1,sp:1.7,pts:[[8,0],[0,0],[0,2.2],[0,0]]},{sh:C.mint,sk:SK[2],ha:HAIR[2],p:2,ty:'w',box:1,sp:1.5,pts:[[8,2.6],[8,0],[11.6,0],[8,0]]},{sh:C.violet,sk:SK[0],ha:HAIR[1],p:3,ty:'w',sp:1.6,pts:[[-8,-2.4],[-8,0],[0,0],[0,-2.2],[0,0],[-8,0]]},{sh:C.red,sk:SK[3],ha:HAIR[3],p:4,ty:'w',pants:C.pants2,sp:1.2,pts:[[-11.6,0],[0,0],[0,4.6],[0,0]]},{sh:C.blue,sk:SK[4],ha:HAIR[0],p:5,ty:'w',sp:1.5,pts:[[8,-2.4],[8,0],[-8,0],[-8,2.4],[-8,0],[8,0]]}];
+ROUTE.forEach(function(r){var L=0;r.len=[];r.pts.forEach(function(p,i){var q=r.pts[(i+1)%r.pts.length],d=Math.hypot(q[0]-p[0],q[1]-p[1]);r.len.push(d);L+=d});r.tot=L});
+function along(r,t){var s=(t*r.sp+r.p*3)%r.tot;for(var i=0;i<r.pts.length;i++){if(s<=r.len[i]){var p=r.pts[i],q=r.pts[(i+1)%r.pts.length],u=s/r.len[i];return [p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u,Math.atan2(q[0]-p[0],q[1]-p[1]),i]}s-=r.len[i]}return [0,0,0,0]}
+function route(a,b){var A=NODE[a],B=NODE[b];return A[0]===B[0]?[A,[A[0],3.3,0],B]:[A,[A[0],3.3,0],[B[0],3.3,0],B]}
+function point(pts,u){var L=[],T=0;for(var i=0;i<pts.length-1;i++){var d=Math.abs(pts[i+1][0]-pts[i][0])+Math.abs(pts[i+1][2]-pts[i][2]);L.push(d);T+=d}var s=Math.max(0,Math.min(1,u))*T;for(i=0;i<L.length;i++){if(s<=L[i]||i===L.length-1){var v=L[i]?s/L[i]:0;return [pts[i][0]+(pts[i+1][0]-pts[i][0])*v,3.3,pts[i][2]+(pts[i+1][2]-pts[i][2])*v]}s-=L[i]}}
+var STEP=2.6,stepEls=$$('#of-steps li'),lastS=-1,D=new Float32Array(420000),dArr=[],pkArr=[];
+function dyn(t){dArr.length=0;pkArr.length=0;var o=dArr,k=Math.floor(t/STEP)%6,u=(t/STEP)%1,key=ORDER[k],nxt=ORDER[(k+1)%6],R=RM[key];
+  W.forEach(function(w){var act=(w.x>-4&&w.z>0&&w.x<4&&key==='sales')||(w.x<-4&&w.z>0&&key==='cs')||(w.x<-4&&w.z<0&&key==='fin')||(w.x>4&&w.z<0&&key==='hr')||(w.z<-1&&Math.abs(w.x)<4&&key==='ctrl');
+    figure(o,w.x,w.z,w.a,w,t*(act?1.7:1),w.ty==='stand'?.1:-1.25,false,false)});
+  ROUTE.forEach(function(r){var p=along(r,t);figure(o,p[0],p[1],p[2],r,t+r.p,r.box&&(p[3]<2)?-1.45:null,true,r.box&&(p[3]<2))});
+  var vr=[-1,1].map(function(s,i){return (Math.sin(t*1.3+i)+1)/2});
+  for(var b=0;b<9;b++){var h=.3+1.2*(.5+.5*Math.sin(t*1.1+b*1.3))*(key==='ctrl'?1:.72),c=b===6&&Math.sin(t*.7)>.6?C.red:(b%3?C.blue:C.mint);box(o,I,-2.5+b*.62,1.2,-9.63,.42,h,.03,c,1)}
+  [-2.2,2.2].forEach(function(x,i){box(o,I,x,.86,-3.4,.9,.5,.06,i?C.mint:C.sky,1)});
+  var bx=R[0],bz=R[1],g=.6+.4*Math.sin(t*6),edge=ACC[key];[[0,-4,7.5,.14],[0,4,7.5,.14],[-3.72,0,.14,8],[3.72,0,.14,8]].forEach(function(e){box(pkArr,I,bx+e[0],.02,bz+e[1],e[2],.05+.05*g,e[3],edge,1)});
+  var rt=route(key,nxt);var pu=Math.min(1,u/.55);if(u<.62)for(var i=0;i<5;i++){var q=point(rt,pu-i*.035),s=.42-i*.07;box(pkArr,I,q[0],q[1]-s/2+.05,q[2],s,s,s,i?C.sky:C.white,1)}
+  var rise=Math.min(1,u*1.6),by=4.1+rise*.5;box(pkArr,I,bx,by,bz,.7,.5,.14,C.white,1);box(pkArr,I,bx-.16,by+.13,bz,.1,.24,.16,edge,1);box(pkArr,I,bx+.1,by+.1,bz,.46,.12,.16,edge,1);
+  if(k!==lastS){lastS=k;stepEls.forEach(function(e,i){e.classList.toggle('on',i===k)})}}
+function draw(t){dyn(t);var d=dArr.concat(pkArr),nD=dArr.length/10,nP=pkArr.length/10;if(d.length>D.length)D=new Float32Array(d.length*1.3);D.set(d);
+  gl.bindBuffer(gl.ARRAY_BUFFER,bD);gl.bufferData(gl.ARRAY_BUFFER,D.subarray(0,d.length),gl.DYNAMIC_DRAW);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT|gl.STENCIL_BUFFER_BIT);gl.uniform1f(uS,0);
+  gl.enable(gl.STENCIL_TEST);gl.stencilFunc(gl.ALWAYS,1,255);gl.stencilOp(gl.KEEP,gl.KEEP,gl.REPLACE);bind(bS);gl.drawArrays(gl.TRIANGLES,0,nF);
+  gl.uniform1f(uS,1);gl.stencilFunc(gl.EQUAL,1,255);gl.stencilOp(gl.KEEP,gl.KEEP,gl.INCR);gl.depthMask(false);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ZERO,gl.ONE);gl.disable(gl.CULL_FACE);
+  gl.drawArrays(gl.TRIANGLES,nF,nC);bind(bD);gl.drawArrays(gl.TRIANGLES,0,nD);
+  gl.enable(gl.CULL_FACE);gl.disable(gl.BLEND);gl.depthMask(true);gl.disable(gl.STENCIL_TEST);gl.uniform1f(uS,0);bind(bS);gl.drawArrays(gl.TRIANGLES,nF,nC+nN);bind(bD);gl.drawArrays(gl.TRIANGLES,0,nD+nP)}
+var seen=false,run=!calm,raf=0,t0=performance.now(),clock=0,last=0;
+function frame(n){raf=0;var dt=Math.min(.05,(n-last)/1000);last=n;clock+=dt;view();labels();draw(clock);if(run&&seen&&current==='home'&&!document.hidden)raf=requestAnimationFrame(frame)}
+function kick(){if(!raf&&seen&&current==='home'){last=performance.now();raf=requestAnimationFrame(frame)}}
+function once(){size();view();labels();draw(clock);st.classList.add('live')}
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){seen=es[0].isIntersecting;if(seen)kick()},{rootMargin:'120px'}).observe(st);else seen=true;
+window.addEventListener('resize',function(){if(current==='home'){once()}});document.addEventListener('visibilitychange',kick);
+var dg=null;cv.addEventListener('pointerdown',function(e){dg={x:e.clientX,y:dragYaw};try{cv.setPointerCapture(e.pointerId)}catch(_){ }});
+cv.addEventListener('pointermove',function(e){if(!dg)return;dragYaw=Math.max(-.62,Math.min(.62,dg.y+(e.clientX-dg.x)*.006));if(!run){view();labels();draw(clock)}});
+['pointerup','pointercancel'].forEach(function(n){cv.addEventListener(n,function(){dg=null})});
+var pb=$('#of-toggle');function pl(){pb.textContent=run?T('Jeda','Pause'):T('Lanjutkan','Resume')}
+pb.addEventListener('click',function(){run=!run;pl();if(run)kick()});
+return {lang:pl,sync:function(){if(current==='home'){once();kick()}}};
+})();
+
+/* Copy buttons */
+$$('[data-copy]').forEach(function(b){b.addEventListener('click',function(){
+  var el=document.getElementById(b.dataset.copy),done=function(){var o=b.innerHTML;b.textContent=T('Tersalin','Copied');setTimeout(function(){b.innerHTML=o},1500)};
+  var pick=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.textContent).then(done,pick);else pick();
+})});
+
+window.__ofl=office.lang;route();setLang(lang);office.sync();
+})();
+</script>
+
+</body>
+</html>
